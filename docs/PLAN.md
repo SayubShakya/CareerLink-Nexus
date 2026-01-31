@@ -54,9 +54,17 @@
 ## 4. Verification Plan
 - [ ] **Frontend:** Page loads on `http://localhost:3000` showing "System Status: Online".
 - [ ] **Backend:** `http://localhost:5000/api/health` returns 200 OK.
-- [ ] **Integration:** Frontend successfully fetches data from Backend.
-- [ ] **Database:** Connection established without errors.
+- [x] **Integration:** Frontend successfully fetches data from Backend.
+- [x] **Database:** Connection established without errors.
+
+### Phase 6: Backend Reorganization (Current)
+- **Agent:** `backend-specialist`
+- [ ] Create folder structure (`src/config`, `src/routes`, `src/controllers`, etc.).
+- [ ] Refactor `db.js` into `src/config`.
+- [ ] Refactor `server.js` into `src/app.js` (App) and `server.js` (Entry).
+- [ ] Extract Health API into Route/Controller pattern.
+- [ ] Verify standard middleware (CORS, Error Handling).
 
 ---
 
-**Status:** ⏳ Pending Approval
+**Status:** ⏳ In Progress (Waiting for Plan Approval)
