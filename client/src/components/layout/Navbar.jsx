@@ -1,36 +1,81 @@
 import { Link } from 'react-router-dom';
 
+const navStyles = {
+    nav: {
+        backgroundColor: 'white',
+        boxShadow: 'var(--shadow-sm)',
+        borderBottom: '1px solid var(--color-gray-200)'
+    },
+    container: {
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '0 1rem',
+        height: '64px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
+    logo: {
+        fontSize: '1.5rem',
+        fontWeight: 'bold',
+        color: 'var(--color-primary)',
+        textDecoration: 'none'
+    },
+    links: {
+        display: 'flex',
+        gap: '2rem'
+    },
+    link: {
+        color: 'var(--color-gray-700)',
+        textDecoration: 'none',
+        fontWeight: '500'
+    },
+    actions: {
+        display: 'flex',
+        gap: '1rem',
+        alignItems: 'center'
+    },
+    signIn: {
+        color: 'var(--color-primary)',
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        fontWeight: '500'
+    },
+    signUp: {
+        backgroundColor: 'var(--color-primary)',
+        color: 'white',
+        padding: '0.5rem 1rem',
+        borderRadius: 'var(--radius-md)',
+        border: 'none',
+        cursor: 'pointer',
+        fontWeight: '500'
+    }
+};
+
 export default function Navbar() {
     return (
-        <nav className="bg-white shadow-sm">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16">
-                    <div className="flex items-center">
-                        <Link to="/" className="text-2xl font-bold text-blue-600">
-                            CareerLink
-                        </Link>
-                    </div>
+        <nav style={navStyles.nav}>
+            <div style={navStyles.container}>
+                <div>
+                    <Link to="/" style={navStyles.logo}>
+                        CareerLink
+                    </Link>
+                </div>
 
-                    <div className="hidden md:flex space-x-8">
-                        <Link to="/" className="text-gray-700 hover:text-blue-600 transition-colors">
-                            Home
-                        </Link>
-                        <Link to="/jobs" className="text-gray-700 hover:text-blue-600 transition-colors">
-                            Jobs
-                        </Link>
-                        <Link to="/profile" className="text-gray-700 hover:text-blue-600 transition-colors">
-                            Profile
-                        </Link>
-                    </div>
+                <div style={navStyles.links}>
+                    <Link to="/" style={navStyles.link}>Home</Link>
+                    <Link to="/jobs" style={navStyles.link}>Jobs</Link>
+                    <Link to="/profile" style={navStyles.link}>Profile</Link>
+                </div>
 
-                    <div className="flex items-center space-x-4">
-                        <button className="px-4 py-2 text-blue-600 hover:text-blue-700">
-                            Sign In
-                        </button>
-                        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                            Sign Up
-                        </button>
-                    </div>
+                <div style={navStyles.actions}>
+                    <button style={navStyles.signIn}>
+                        Sign In
+                    </button>
+                    <button style={navStyles.signUp}>
+                        Sign Up
+                    </button>
                 </div>
             </div>
         </nav>
