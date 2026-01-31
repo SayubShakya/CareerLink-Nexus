@@ -1,7 +1,6 @@
 
 const express = require('express');
 const cors = require('cors');
-const morgan = require('morgan'); // If installed, otherwise skip
 const healthRoutes = require('./routes/healthRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const AppError = require('./utils/AppError');
@@ -18,7 +17,7 @@ app.use(express.json());
 app.use('/api/health', healthRoutes);
 
 // Handle Undefined Routes
-app.all('*', (req, res, next) => {
+app.all(/(.*)/, (req, res, next) => {
     next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 

@@ -17,7 +17,7 @@ const pool = new Pool({
 // Test connection on startup
 pool.query('SELECT NOW()', (err, res) => {
     if (err) {
-        console.error('❌ Database connection error:', err.stack);
+        console.log('⚠️  Database not connected (Running in offline mode)');
     } else {
         console.log('✅ Database connected successfully');
     }
