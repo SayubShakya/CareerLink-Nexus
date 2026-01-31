@@ -1,6 +1,9 @@
 export default function Button({ children, variant = 'primary', className = '', ...props }) {
-    // Using standard CSS classes defined in global.css
-    const variantClass = variant === 'outline' ? 'btn-outline' : 'btn-primary';
+    const variantClass = {
+        primary: 'btn-primary',
+        secondary: 'btn-secondary',
+        outline: 'btn-outline'
+    }[variant] || 'btn-primary';
 
     return (
         <button

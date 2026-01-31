@@ -4,18 +4,25 @@
 cleanup_ports() {
     echo "🧹 Cleaning up existing processes on ports 3000 and 5000..."
     
-    # Port 3000 (Frontend)
-    PID_3000=$(lsof -t -i:3000)
-    if [ ! -z "$PID_3000" ]; then
-        echo "Killing process $PID_3000 on port 3000"
-        kill -9 $PID_3000 2>/dev/null
-    fi
-
-    # Port 5000 (Backend)
-    PID_5000=$(lsof -t -i:5000)
-    if [ ! -z "$PID_5000" ]; then
-        echo "Killing process $PID_5000 on port 5000"
-        kill -9 $PID_5000 2>/dev/null
+    # Check OS
+    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+        # Windows
+        for port in 3000 5000; do
+            PID=$(netstat -ano | grep ":$port" | grep "LISTENING" | awk '{print $5}' | head -n 1)
+            if [ ! -z "$PID" ]; then
+                echo "Killing process $PID on port $port"
+                taskkill -F -PID $PID 2>/dev/null
+            fi
+        done
+    else
+        # Linux / macOS
+        for port in 3000 5000; do
+            PID=$(lsof -t -i:$port)
+            if [ ! -z "$PID" ]; then
+                echo "Killing process $PID on port $port"
+                kill -9 $PID 2>/dev/null
+            fi
+        done
     fi
 }
 

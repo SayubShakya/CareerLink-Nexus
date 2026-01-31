@@ -9,11 +9,28 @@ const server = app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
 });
 
-// Handle Unhandled Rejections (e.g. DB connection failed)
+// Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
     console.log('UNHANDLED REJECTION! 💥 Shutting down...');
     console.log(err.name, err.message);
     server.close(() => {
         process.exit(1);
+    });
+});
+
+// Graceful shutdown on SIGTERM (e.g., from Heroku/Docker)
+process.on('SIGTERM', () => {
+    console.log('👋 SIGTERM RECEIVED. Shutting down gracefully');
+    server.close(() => {
+        console.log('💥 Process terminated!');
+    });
+});
+
+// Graceful shutdown on SIGINT (Ctrl+C)
+process.on('SIGINT', () => {
+    console.log('👋 SIGINT RECEIVED. Shutting down gracefully');
+    server.close(() => {
+        console.log('💥 Process terminated!');
+        process.exit(0);
     });
 });
