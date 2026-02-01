@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../../assets/temporary_logo.png';
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
@@ -52,8 +53,8 @@ export default function Navbar() {
     return (
         <nav className={`sticky-header ${scrolled ? 'scrolled' : ''}`} aria-label="Main Navigation">
             <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                <Link to="/" style={navStyles.brand}>
-                    <span style={navStyles.accent}>Career</span>Link
+                <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
+                    <img src={logo} alt="CareerLink" style={{ height: '40px', objectFit: 'contain' }} />
                 </Link>
 
                 <nav style={navStyles.navLinks} aria-label="Quick Links">

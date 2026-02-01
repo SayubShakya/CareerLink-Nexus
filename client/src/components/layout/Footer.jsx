@@ -1,3 +1,5 @@
+import logo from '../../assets/temporary_logo.png';
+
 export default function Footer() {
     const footerStyle = {
         backgroundColor: 'var(--bg-dark)',
@@ -65,9 +67,9 @@ export default function Footer() {
                 {/* Main Footer Links */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '50px', marginBottom: '80px' }}>
                     <div style={{ gridColumn: 'span 2' }}>
-                        <h3 style={{ fontSize: '1.6rem', fontWeight: '800', marginBottom: '20px' }}>
-                            <span style={{ color: 'var(--color-brand-accent)' }}>Career</span>Link
-                        </h3>
+                        <div style={{ marginBottom: '20px' }}>
+                            <img src={logo} alt="CareerLink" style={{ height: '35px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+                        </div>
                         <p style={{ color: 'var(--text-light)', fontSize: '1rem', lineHeight: '1.8', maxWidth: '300px' }}>
                             The premier ecosystem where the world's most innovative companies meet world-class talent.
                         </p>
