@@ -1,127 +1,91 @@
-# CareerLink: Connecting Job Seekers and Employers
+# CareerLink: The Nexus Master Guide
 **University of Bedfordshire | CIS047-3 Agile Project Management | Team Nexus**
 
-![Project Status](https://img.shields.io/badge/Status-Development-blue) ![Methodology](https://img.shields.io/badge/Methodology-XP-green) ![License](https://img.shields.io/badge/License-MIT-lightgrey)
+![Project Status](https://img.shields.io/badge/Status-Development-blue) ![Methodology](https://img.shields.io/badge/Methodology-Scrumban-orange) ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
 ---
 
-## 📖 About the Project
+## 🧐 1. Project Summary (What, How, When, Why)
 
-**CareerLink** is a streamlined job portal designed to solve the "noise" and "ghosting" problems of modern recruitment platforms. Built by **Team Nexus**, this project serves as our final year submission, demonstrating the practical application of **Extreme Programming (XP)** and **Agile Project Management**.
+### WHAT is CareerLink?
+CareerLink is a **minimalist, feedback-first job portal** designed specifically for students and early-career seekers. 
+- It removes the social media noise found on other sites.
+- It provides a **One-Click Apply** system based on pre-vetted user profiles.
+- It ensures employers provide mandatory feedback on every application.
 
-### The Problem
-*   **LinkedIn** is too cluttered with social media posts, distracting from the actual job search.
-*   **Indeed/Upwork** suffer from "ghosting"—applicants never hear back from employers.
-*   **Complexity:** Existing platforms are often too complex for students or first-time job seekers.
+### HOW do we build it?
+We use the **Scrumban Methodology**, which gives us the discipline of Scrum and the speed of Kanban.
+- **Workflow**: We use a Kanban board with **WIP limits** to ensure we finish what we start.
+- **Lenses**: Every team member looks at the code through a specific Role Lens (Quality, Risk, etc.).
+- **Tools**: Google Chat for daily sync, Google Meet for weekly stand-ups, and React/Node.js for the build.
 
-### The Solution: CareerLink
-*   **Zero Clutter:** A 100% focus on jobs. No social feeds.
-*   **Mandatory Feedback:** Employers must update application statuses (e.g., "Reviewing," "Rejected," "Hired").
-*   **One-Click Apply:** Simplified profiles allow for instant applications.
+### WHEN is it delivered? (The Roadmap)
+- **Weeks 1-3 (Foundation)**: Setup, planning, and requirements. (Completed)
+- **Weeks 4-6 (Core)**: Authentication, Job Feed, and Seeker Profile Builder. **(Current Phase)**
+- **Weeks 7-8 (Advanced)**: One-Click application logic and Employer Dashboards.
+- **Week 9-10 (Review)**: Final testing, bug fixing, and academic submission.
+
+### WHY are we building it?
+- **For Users**: To end the frustration of "applying into a void" and provide a distraction-free environment.
+- **For the Assessment**: To demonstrate mastery of Agile roles (PM, Quality, Risk, etc.) in a real software lifecycle.
 
 ---
 
-## 👥 Team Nexus
+## 👥 2. Team Nexus (Agile Lenses)
 
-| Name | Role | Responsibilities |
+| Name | Role | Core Responsibility |
 | :--- | :--- | :--- |
-| **Nihariks Shakya** | Product Owner / Manager | Defines features, manages backlog, represents stakeholders. |
-| **Sayub Shakya** | Scheduling Manager | Manages timelines, runs stand-ups, unblocks the team. |
-| **Aayush Man Shakya** | Start-up Manager | Manages setup, deployment, and initial configuration. |
-| **DipeshRaj Shrestha** | Quality Manager | Ensures code quality, manages testing (QA), and reviews PRs. |
-| **Amogh Shakya** | Risk Manager | Identifies project risks and ensures mitigation strategies. |
+| **Nihariks Shakya** | Product Owner / Manager | Feature vision, prioritization, stakeholder alignment. |
+| **Sayub Shakya** | Scheduling Manager | Flow management, meeting planning, Kanban synchronization. |
+| **Aayush Man Shakya** | Start-up Manager | Problem definition, user personas, tech configuration. |
+| **DipeshRaj Shrestha** | Quality Manager | Acceptance criteria, testing, code review standards. |
+| **Amogh Shakya** | Risk Manager | Threat identification, mitigation planning, safety audits. |
 
 ---
 
-## 🛠️ Tech Stack
+## ⚙️ 3. Development Workflow (Scrumban)
 
-We utilize a modern MERN-like stack to ensure performance and scalability:
+### The Kanban Board
+- **Backlog**: Future ideas and requirements.
+- **Ready**: Priority tasks for the current week.
+- **In Progress**: Active work (Limit: 1-2 tasks per person).
+- **Quality Review**: Code waiting for QA verification.
+- **Done**: Fully tested and merged.
 
-*   **Frontend:** React.js (Vite) + Vanilla CSS / Tailwind (for simplified styling)
-*   **Backend:** Node.js + Express.js
-*   **Database:** PostgreSQL (Relational integrity for job/application data)
-*   **Project Management:** GitHub Projects (Kanban Board)
+### Git & Branching Strategy
+1. **Never push to `main`**: All features must start in a `feature/name` branch.
+2. **Pull Requests (PR)**: Merging requires a review from the **Quality Manager** or **PM**.
+3. **Daily Progress**: Use **Google Chat** for quick updates and pair programming requests.
 
----
-
-## 🎯 MoSCoW Prioritisation
-
-We strictly follow the MoSCoW method to ensure we deliver a working MVP by Week 10.
-
-### ✅ Must Have (The MVP)
-*   User Authentication (Seeker vs. Employer).
-*   **The Job Feed:** Clean list of active jobs.
-*   **Post a Job:** Simple form for employers.
-*   **Apply:** One-click application for seekers.
-*   **Dashboard:** View status of applications.
-
-### ⚠️ Should Have (Important)
-*   **Status Indicators:** Visual tags for "Applied," "Interviewing," "Rejected."
-*   **Profile Skills:** Tagging system (e.g., "Python," "Design").
-*   Search & Filter functionality.
-
-### 🔮 Could Have (Nice-to-have)
-*   Profile picture uploads.
-*   Salary range filters.
-*   "Saved Jobs" bookmarking.
-
-### ❌ Won't Have (Out of Scope)
-*   In-app messaging/Chat.
-*   Payment processing.
-*   AI-based job matching.
+### Definition of Done (DoD)
+A task is NOT finished until:
+- [ ] It meets the criteria in `REQUIREMENTS_JOB_SEEKER.md`.
+- [ ] No console errors or UI bugs exist.
+- [ ] It has been reviewed through our specialized "Lenses."
+- [ ] It is merged into the `main` branch.
 
 ---
 
-## 📅 Development Workflow (XP)
-
-We adhere to **Extreme Programming (XP)** principles:
-1.  **Weekly Sprints:** We plan and execute in 1-week cycles.
-2.  **Pair Programming:** Critical features are built by pairs to reduce bugs.
-3.  **TDD (Test Driven Development):** We write tests for core logic before implementation.
-4.  **Stand-ups:** Every **Sunday at 7:00 PM** to sync progress and clear blockers.
+## 🤝 4. Collaboration & Communication
+- **Sunday Stand-up**: Be on time at **9:00 PM** for the Google Meet sessions.
+- **Google Chat**: Use our Nexus group (College Email) for day-to-day feedback and sharing ideas.
+- **Classroom Sessions**: Use lab time for face-to-face brainstorming and teacher consultation.
+- **Internal Demos**: We hold internal "show and tell" sessions to catch bugs early.
 
 ---
 
-## 🚀 How to Run Locally
+## 🛠️ 5. Tech Stack & Setup
 
-*(Instructions for developers)*
+### Stack
+- **Frontend**: React.js (Vite) + Vanilla CSS
+- **Backend**: Node.js + Express.js
+- **Database**: PostgreSQL / Supabase
 
-1.  **Clone the Repo:**
-    ```bash
-    git clone https://github.com/StartUp-Manager/CareerLink-Nexus.git
-    cd CareerLink-Nexus
-    ```
-
-2.  **Install Dependencies:**
-    ```bash
-    # Frontend
-    cd client
-    npm install
-    
-    # Backend
-    cd ../server
-    npm install
-    ```
-
-3.  **Setup Database:**
-    *   Ensure PostgreSQL is running.
-    *   Create a database named `careerlink`.
-    *   Configure `.env` file (see `.env.example`).
-
-4.  **Run the App:**
-    ```bash
-    # Run both (if concurrent script exists)
-    npm run dev
-    ```
+### Local Installation
+1. **Clone**: `git clone [REPO_URL]`
+2. **Install**: Run `npm install` in both `/client` and `/server`.
+3. **Environment**: Setup `.env` files based on `.env.example`.
+4. **Run**: Use `npm run dev` or the provided `run.sh` script.
 
 ---
-
-## ⚠️ Risk Management (Assessment 1)
-
-*   **Scope Creep:** Mitigated by strict adherence to the **"Must Have"** list.
-*   **Time Constraints:** Mitigated by weekly **Stand-ups** and **GitHub Projects** tracking.
-*   **Technical Debt:** Mitigated by **Clean Code** standards and **Peer Reviews**.
-
----
-
-*Verified by Team Nexus | 2026*
+**One Project. One Team. One Nexus.**

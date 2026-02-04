@@ -1,4 +1,4 @@
-import logo from '../../assets/temporary_logo.png';
+import logo from '@assets/images/temporary_logo.png';
 
 export default function Footer() {
     const footerStyle = {
@@ -68,7 +68,7 @@ export default function Footer() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '50px', marginBottom: '80px' }}>
                     <div style={{ gridColumn: 'span 2' }}>
                         <div style={{ marginBottom: '20px' }}>
-                            <img src={logo} alt="CareerLink" style={{ height: '35px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+                            <img src={logo} alt="CareerLink" style={{ height: '120px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
                         </div>
                         <p style={{ color: 'var(--text-light)', fontSize: '1rem', lineHeight: '1.8', maxWidth: '300px' }}>
                             The premier ecosystem where the world's most innovative companies meet world-class talent.
