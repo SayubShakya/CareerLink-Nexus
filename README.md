@@ -66,6 +66,15 @@ A task is NOT finished until:
 
 ---
 
+## 📚 Technical Documentation
+
+For in-depth technical details regarding our architecture and folder structures, please refer to the following guides:
+
+*   [**Frontend Architecture**](./docs/FRONTEND_STRUCTURE.md): Detailed breakdown of the React/Vite structure, naming conventions, and best practices.
+*   [**Backend Architecture**](./docs/BACKEND_STRUCTURE.md): Explanation of the Service-Controller-Route (SCR) pattern and database configuration.
+
+---
+
 ## 🤝 4. Collaboration & Communication
 - **Sunday Stand-up**: Be on time at **9:00 PM** for the Google Meet sessions.
 - **Google Chat**: Use our Nexus group (College Email) for day-to-day feedback and sharing ideas.
