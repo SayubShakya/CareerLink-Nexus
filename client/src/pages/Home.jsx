@@ -1,12 +1,10 @@
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
 import Slider from '@/components/common/Slider';
 import meshBg from '@/assets/images/mesh-bg.png';
 
 export default function Home() {
     const homeStyles = {
         heroSection: {
-            paddingTop: 'calc(var(--header-height) + 120px)',
+            paddingTop: '120px',
             paddingBottom: '100px',
             position: 'relative',
             minHeight: '85vh',
@@ -58,8 +56,6 @@ export default function Home() {
 
     return (
         <div style={{ position: 'relative', backgroundColor: 'white' }}>
-            <Navbar />
-
             <main>
                 {/* Section 1: Hero */}
                 <section style={homeStyles.heroSection}>
@@ -128,8 +124,6 @@ export default function Home() {
                     </div>
                 </section>
             </main>
-
-            <Footer />
         </div>
     );
 }

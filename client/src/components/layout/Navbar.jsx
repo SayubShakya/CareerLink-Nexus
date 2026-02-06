@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '@assets/images/temporary_logo.png';
+import { ROUTES } from '../../routes/routes';
 
-export default function Navbar() {
+export default function Navbar({ openAuthModal }) {
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
@@ -58,10 +59,24 @@ export default function Navbar() {
                 </Link>
 
                 <nav style={navStyles.navLinks} aria-label="Quick Links">
-                    <Link to="/jobs" style={navStyles.link} className="nav-item" aria-label="Explore Jobs">Explore</Link>
-                    <Link to="/talents" style={navStyles.link} className="nav-item" aria-label="Our Talents">Talents</Link>
-                    <Link to="/about" style={navStyles.link} className="nav-item" aria-label="Our Story">Story</Link>
-                    <button style={navStyles.btn} aria-label="Join CareerLink">Join Now</button>
+                    <Link to="/" style={navStyles.link} className="nav-item" aria-label="Home">Home</Link>
+                    <Link to="/find-jobs" style={navStyles.link} className="nav-item" aria-label="Find Jobs">Find Jobs</Link>
+                    <Link to="/contact-us" style={navStyles.link} className="nav-item" aria-label="Contact Us">Contact Us</Link>
+                    <span
+                        style={{ ...navStyles.link, cursor: 'pointer' }}
+                        className="nav-item"
+                        aria-label="Sign In"
+                        onClick={() => openAuthModal('login')}
+                    >
+                        Sign In
+                    </span>
+                    <button
+                        style={navStyles.btn}
+                        aria-label="Sign Up"
+                        onClick={() => openAuthModal('signup')}
+                    >
+                        Sign Up
+                    </button>
                 </nav>
             </div>
 
