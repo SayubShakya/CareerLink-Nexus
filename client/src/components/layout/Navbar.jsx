@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import logo from '@assets/images/temporary_logo.png';
 import { ROUTES } from '../../routes/routes';
 
-export default function Navbar({ openAuthModal }) {
+export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
@@ -62,21 +62,16 @@ export default function Navbar({ openAuthModal }) {
                     <Link to="/" style={navStyles.link} className="nav-item" aria-label="Home">Home</Link>
                     <Link to="/find-jobs" style={navStyles.link} className="nav-item" aria-label="Find Jobs">Find Jobs</Link>
                     <Link to="/contact-us" style={navStyles.link} className="nav-item" aria-label="Contact Us">Contact Us</Link>
-                    <span
-                        style={{ ...navStyles.link, cursor: 'pointer' }}
-                        className="nav-item"
-                        aria-label="Sign In"
-                        onClick={() => openAuthModal('login')}
-                    >
+                    <Link to={ROUTES.LOGIN} style={navStyles.link} className="nav-item" aria-label="Sign In">
                         Sign In
-                    </span>
-                    <button
-                        style={navStyles.btn}
+                    </Link>
+                    <Link
+                        to={ROUTES.REGISTER}
+                        style={{ ...navStyles.btn, textDecoration: 'none', display: 'inline-block' }}
                         aria-label="Sign Up"
-                        onClick={() => openAuthModal('signup')}
                     >
                         Sign Up
-                    </button>
+                    </Link>
                 </nav>
             </div>
 
