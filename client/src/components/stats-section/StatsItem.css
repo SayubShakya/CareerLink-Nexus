@@ -1,0 +1,78 @@
+.stats-container {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-xl);
+    padding: var(--space-xl) var(--space-md);
+    flex-wrap: wrap;
+    background: var(--bg-main);
+}
+
+.stats-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 200px;
+    transition: transform 0.3s ease;
+}
+
+.stats-item:hover {
+    transform: translateY(-5px);
+}
+
+.stats-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-sm);
+    transition: all 0.3s ease;
+}
+
+.stats-item:hover .stats-icon-wrapper {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.stats-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-brand-primary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.stats-label {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin: 4px 0 0 0;
+    font-weight: 500;
+}
+
+/* Color Variants */
+.stats-item.blue .stats-icon-wrapper {
+    background-color: rgba(62, 97, 255, 0.1);
+    color: #3E61FF;
+}
+
+.stats-item.green .stats-icon-wrapper {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #10B981;
+}
+
+.stats-item.orange .stats-icon-wrapper {
+    background-color: rgba(249, 115, 22, 0.1);
+    color: #f97316;
+}
+
+@media (max-width: 768px) {
+    .stats-container {
+        gap: var(--space-lg);
+        padding: var(--space-lg) var(--space-md);
+    }
+
+    .stats-number {
+        font-size: 1.75rem;
+    }
+}
