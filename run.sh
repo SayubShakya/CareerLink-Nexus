@@ -44,18 +44,19 @@ cleanup_ports
 
 echo "🚀 Starting CareerLink Hub..."
 
-# Check if node_modules exist to avoid unnecessary npm installs every time
-if [ ! -d "server/node_modules" ]; then
-    echo "📦 Installing Backend Dependencies..."
-    (cd server && npm install)
+# Auto-install dependencies
+echo "📦 Checking/Installing Backend Dependencies..."
+(cd server && npm install --no-fund --no-audit)
+
+echo "📦 Checking/Installing Frontend Dependencies..."
+(cd client && npm install --no-fund --no-audit)
+
+if [ $? -ne 0 ]; then
+    echo "❌ Failed to install dependencies. Please check your internet connection."
+    exit 1
 fi
 
-if [ ! -d "client/node_modules" ]; then
-    echo "📦 Installing Frontend Dependencies..."
-    (cd client && npm install)
-fi
-
-echo "✅ Ready to launch!"
+echo "✅ Dependencies verified!"
 echo "🏃 Starting Servers... (Press Ctrl+C to stop everything)"
 
 # Start both in background

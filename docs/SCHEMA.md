@@ -26,6 +26,7 @@ This document defines the PostgreSQL database structure for the CareerLink Nexus
 | :--- | :--- | :--- | :--- |
 | id | UUID | PRIMARY KEY | |
 | email | VARCHAR(255) | UNIQUE, NOT NULL | Official Company Email |
+| password_hash | TEXT | NOT NULL | |
 | organization_name | VARCHAR(255) | NOT NULL | |
 | company_website | VARCHAR(255) | NOT NULL | |
 | is_verified | BOOLEAN | DEFAULT FALSE | |
