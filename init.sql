@@ -10,3 +10,4 @@ CREATE TABLE IF NOT EXISTS system_status (
 );
 
 INSERT INTO system_status (status_text) VALUES ('Database Initialized');
+
