@@ -1,83 +1,18 @@
+import Hero from '@/components/hero/hero';
+import StatsSection from '@/components/stats-section/StatsSection';
 import Slider from '@/components/common/Slider';
 import meshBg from '@/assets/images/mesh-bg.png';
 
 export default function Home() {
-    const homeStyles = {
-        heroSection: {
-            paddingTop: '120px',
-            paddingBottom: '100px',
-            position: 'relative',
-            minHeight: '85vh',
-            display: 'flex',
-            alignItems: 'center',
-        },
-        heroContent: {
-            maxWidth: '900px',
-            margin: '0 auto',
-            textAlign: 'center',
-            position: 'relative',
-            zIndex: 10
-        },
-        preTitle: {
-            fontSize: '0.85rem',
-            fontWeight: '700',
-            color: 'var(--color-brand-accent)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.3em',
-            marginBottom: 'var(--space-sm)',
-            display: 'block'
-        },
-        title: {
-            fontSize: 'clamp(3.5rem, 8vw, 6rem)',
-            fontWeight: '800',
-            marginBottom: 'var(--space-md)',
-            color: 'var(--color-brand-primary)',
-            letterSpacing: '-0.04em'
-        },
-        editorialText: {
-            fontSize: '0.9em',
-            verticalAlign: 'baseline',
-            marginLeft: '5px'
-        },
-        subtitle: {
-            fontSize: '1.25rem',
-            color: 'var(--text-muted)',
-            maxWidth: '650px',
-            margin: '0 auto 50px auto',
-            lineHeight: '1.7'
-        },
-        btnContainer: {
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '20px',
-            marginTop: '40px'
-        }
-    };
-
     return (
         <div style={{ position: 'relative', backgroundColor: 'white' }}>
             <main>
                 {/* Section 1: Hero */}
-                <section style={homeStyles.heroSection}>
-                    <div className="hero-visual-wrapper">
-                        <img src={meshBg} alt="" className="mesh-bg" />
-                    </div>
+                <Hero />
 
-                    <div className="container" style={homeStyles.heroContent}>
-                        <span style={homeStyles.preTitle} className="animate-up">Elite Talent Network</span>
-                        <h1 style={homeStyles.title} className="animate-up delay-1">
-                            Refined <span className="editorial-title" style={homeStyles.editorialText}>Opportunities</span>
-                        </h1>
-                        <p style={homeStyles.subtitle} className="animate-up delay-2">
-                            Where exceptional talent meets industry-defining companies. Join the premier ecosystem for modern professional growth.
-                        </p>
+                {/* Section 2: Stats */}
+                <StatsSection />
 
-                        <div className="animate-up delay-2" style={homeStyles.btnContainer}>
-                            <button className="btn-premium btn-premium-primary">Explore Collection</button>
-                            <button className="btn-premium btn-premium-outline">Our Philosophy</button>
-                        </div>
-                    </div>
-                </section>
 
                 {/* Section 2: Visual Experience (Slider) */}
                 <section style={{ paddingBottom: '120px' }} className="animate-up delay-2">
