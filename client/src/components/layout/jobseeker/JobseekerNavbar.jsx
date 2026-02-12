@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from '@assets/images/temporary_logo.png';
 import authService from '@/services/authService';
 import { ROUTES } from '@/routes/routes';
-import { Search, FilePlus, ClipboardList, LogOut, User } from 'lucide-react';
+import { Search, FilePlus, ClipboardList, LogOut, User, FileText } from 'lucide-react';
 
 const JobseekerNavbar = () => {
     const navigate = useNavigate();
@@ -106,6 +106,10 @@ const JobseekerNavbar = () => {
                 <Link to={ROUTES.CV_BUILDER} style={styles.link} className="nav-item">
                     <FilePlus size={18} />
                     Create CV
+                </Link>
+                <Link to={ROUTES.MY_CVS} style={styles.link} className="nav-item">
+                    <FileText size={18} />
+                    My CVs
                 </Link>
                 <Link to={ROUTES.JOBSEEKER_PROFILE} style={styles.link} className="nav-item">
                     <User size={18} />
