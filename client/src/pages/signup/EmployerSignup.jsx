@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import authIllustration from '@/assets/images/auth-illustration.png';
 import logo from '@assets/images/temporary_logo.png';
 import { ROUTES } from '@/routes/routes';
-import api from '@/services/api';
+import authService from '@/services/authService';
 
 const styles = {
     pageContainer: {
@@ -197,24 +197,8 @@ const EmployerSignup = () => {
         setLoading(true);
         setServerError('');
 
-        // Ensure website has protocol
-        let website = formData.companyWebsite;
-        if (!/^https?:\/\//i.test(website)) {
-            website = 'https://' + website;
-        }
-
         try {
-            const res = await api.post('/auth/register/employer', {
-                organization_name: formData.companyName,
-                company_website: website,
-                email: formData.email,
-                password: formData.password
-            });
-
-            localStorage.setItem('token', res.data.token);
-            localStorage.setItem('user', JSON.stringify(res.data.data.user));
-            localStorage.setItem('role', res.data.data.role);
-
+            await authService.registerEmployer(formData);
             navigate('/profile-setup');
         } catch (err) {
             const message = err.response?.data?.message || 'Registration failed. Please try again.';

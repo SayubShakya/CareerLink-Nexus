@@ -1,10 +1,9 @@
-const Role = require('../models/Role');
+const roleService = require('../services/roleService');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/AppError');
 
 // Get all roles
 exports.getAllRoles = catchAsync(async (req, res, next) => {
-    const roles = await Role.findAll();
+    const roles = await roleService.findAll();
 
     res.status(200).json({
         status: 'success',
@@ -15,8 +14,7 @@ exports.getAllRoles = catchAsync(async (req, res, next) => {
 
 // Create a new role
 exports.createRole = catchAsync(async (req, res, next) => {
-    const { name } = req.body;
-    const newRole = await Role.create({ name });
+    const newRole = await roleService.create(req.body);
 
     res.status(201).json({
         status: 'success',
@@ -26,12 +24,7 @@ exports.createRole = catchAsync(async (req, res, next) => {
 
 // Get a single role
 exports.getRole = catchAsync(async (req, res, next) => {
-    const { id } = req.params;
-    const role = await Role.findByPk(id);
-
-    if (!role) {
-        return next(new AppError('No role found with that ID', 404));
-    }
+    const role = await roleService.findById(req.params.id);
 
     res.status(200).json({
         status: 'success',
@@ -41,17 +34,7 @@ exports.getRole = catchAsync(async (req, res, next) => {
 
 // Update a role
 exports.updateRole = catchAsync(async (req, res, next) => {
-    const { id } = req.params;
-    const { name } = req.body;
-
-    const role = await Role.findByPk(id);
-
-    if (!role) {
-        return next(new AppError('No role found with that ID', 404));
-    }
-
-    role.name = name;
-    await role.save();
+    const role = await roleService.update(req.params.id, req.body);
 
     res.status(200).json({
         status: 'success',
@@ -61,14 +44,7 @@ exports.updateRole = catchAsync(async (req, res, next) => {
 
 // Delete a role
 exports.deleteRole = catchAsync(async (req, res, next) => {
-    const { id } = req.params;
-    const role = await Role.findByPk(id);
-
-    if (!role) {
-        return next(new AppError('No role found with that ID', 404));
-    }
-
-    await role.destroy();
+    await roleService.delete(req.params.id);
 
     res.status(204).json({
         status: 'success',

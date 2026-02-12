@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import authIllustration from '@/assets/images/auth-illustration.png';
 import logo from '@assets/images/temporary_logo.png';
-import api from '@/services/api';
+import authService from '@/services/authService';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -182,16 +182,7 @@ const Login = () => {
         setServerError('');
 
         try {
-            const res = await api.post('/auth/login', {
-                email: formData.email,
-                password: formData.password
-            });
-
-            // Store token and user data
-            localStorage.setItem('token', res.data.token);
-            localStorage.setItem('user', JSON.stringify(res.data.data.user));
-            localStorage.setItem('role', res.data.data.role);
-
+            await authService.login(formData.email, formData.password);
             navigate('/');
         } catch (err) {
             const message = err.response?.data?.message || 'Login failed. Please try again.';

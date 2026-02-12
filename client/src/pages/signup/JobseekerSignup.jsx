@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import authIllustration from '@/assets/images/auth-illustration.png';
 import logo from '@assets/images/temporary_logo.png';
 import { ROUTES } from '@/routes/routes';
-import api from '@/services/api';
+import authService from '@/services/authService';
 
 const styles = {
     pageContainer: {
@@ -195,17 +195,7 @@ const JobseekerSignup = () => {
         setServerError('');
 
         try {
-            const res = await api.post('/auth/register/job-seeker', {
-                first_name: formData.firstName,
-                last_name: formData.lastName,
-                email: formData.email,
-                password: formData.password
-            });
-
-            localStorage.setItem('token', res.data.token);
-            localStorage.setItem('user', JSON.stringify(res.data.data.user));
-            localStorage.setItem('role', res.data.data.role);
-
+            await authService.registerJobSeeker(formData);
             navigate('/profile-setup');
         } catch (err) {
             const message = err.response?.data?.message || 'Registration failed. Please try again.';
