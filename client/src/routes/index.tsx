@@ -9,6 +9,11 @@ import Login from '../pages/login/Login';
 import Signup from '../pages/signup/Signup';
 import JobseekerSignup from '../pages/signup/JobseekerSignup';
 import EmployerSignup from '../pages/signup/EmployerSignup';
+import JobSeekerDashboard from '../pages/dashboard/JobSeekerDashboard';
+import EmployerDashboard from '../pages/dashboard/EmployerDashboard';
+import CVBuilder from '../pages/cv-builder/CVBuilder';
+import EmployerLayout from '../components/layout/employer/EmployerLayout';
+import JobseekerLayout from '../components/layout/jobseeker/JobseekerLayout';
 
 export const router = createBrowserRouter([
     {
@@ -51,8 +56,38 @@ export const router = createBrowserRouter([
                 path: ROUTES.PROFILE_SETUP,
                 element: <ProfileSetup />,
             },
-            // Add more routes here
+            // Common routes removed from here if they belong to role-specific layouts
         ],
+    },
+    {
+        // Job Seeker specific routes
+        element: <JobseekerLayout />,
+        children: [
+            {
+                path: ROUTES.JOBSEEKER_DASHBOARD,
+                element: <JobSeekerDashboard />,
+            },
+            {
+                path: ROUTES.CV_BUILDER,
+                element: <CVBuilder />,
+            },
+            {
+                path: ROUTES.APPLICATION_STATUS,
+                element: <div className="p-20 text-center">View Application Status Component (Coming Soon)</div>,
+            },
+            // Future jobseeker routes like /add-cv, /application-status
+        ]
+    },
+    {
+        // Employer specific routes
+        element: <EmployerLayout />,
+        children: [
+            {
+                path: ROUTES.EMPLOYER_DASHBOARD,
+                element: <EmployerDashboard />,
+            },
+            // Future employer routes like /post-job, /applicants
+        ]
     },
     {
         path: ROUTES.NOT_FOUND,

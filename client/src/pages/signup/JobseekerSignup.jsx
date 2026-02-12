@@ -3,7 +3,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import authIllustration from '@/assets/images/auth-illustration.png';
 import logo from '@assets/images/temporary_logo.png';
 import { ROUTES } from '@/routes/routes';
+import { Eye, EyeOff } from 'lucide-react';
 import authService from '@/services/authService';
+import { toast } from 'react-toastify';
 
 const styles = {
     pageContainer: {
@@ -156,6 +158,8 @@ const JobseekerSignup = () => {
     const [errors, setErrors] = useState({});
     const [serverError, setServerError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const validate = () => {
         const newErrors = {};
@@ -196,10 +200,12 @@ const JobseekerSignup = () => {
 
         try {
             await authService.registerJobSeeker(formData);
-            navigate('/profile-setup');
+            toast.success('Registration successful! Please log in.');
+            navigate(ROUTES.LOGIN, { state: { message: 'Registration successful! Please log in.' } });
         } catch (err) {
             const message = err.response?.data?.message || 'Registration failed. Please try again.';
             setServerError(message);
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -234,8 +240,6 @@ const JobseekerSignup = () => {
 
                     <h2 style={styles.formTitle}>Sign Up</h2>
                     <p style={styles.formSubtitle}>Create your seeker account</p>
-
-                    {serverError && <div style={styles.serverErrorBox}>{serverError}</div>}
 
                     <form onSubmit={handleSubmit}>
                         <div style={styles.row} className="form-row">
@@ -293,35 +297,79 @@ const JobseekerSignup = () => {
                         <div style={styles.row} className="form-row">
                             <div style={styles.inputGroup}>
                                 <label style={styles.label}>Password</label>
-                                <input
-                                    type="password"
-                                    name="password"
-                                    placeholder="Enter your password"
-                                    style={{
-                                        ...styles.input,
-                                        borderColor: errors.password ? '#E53E3E' : 'var(--border-subtle)'
-                                    }}
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    className="auth-input"
-                                />
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        name="password"
+                                        placeholder="Enter your password"
+                                        style={{
+                                            ...styles.input,
+                                            borderColor: errors.password ? '#E53E3E' : 'var(--border-subtle)',
+                                            paddingRight: '45px'
+                                        }}
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        className="auth-input"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        style={{
+                                            position: 'absolute',
+                                            right: '12px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            background: 'none',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            color: 'var(--text-muted)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            padding: '4px'
+                                        }}
+                                    >
+                                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    </button>
+                                </div>
                                 {errors.password && <p style={styles.errorText}>{errors.password}</p>}
                             </div>
 
                             <div style={styles.inputGroup}>
                                 <label style={styles.label}>Confirm Password</label>
-                                <input
-                                    type="password"
-                                    name="confirmPassword"
-                                    placeholder="Enter confirm password"
-                                    style={{
-                                        ...styles.input,
-                                        borderColor: errors.confirmPassword ? '#E53E3E' : 'var(--border-subtle)'
-                                    }}
-                                    value={formData.confirmPassword}
-                                    onChange={handleChange}
-                                    className="auth-input"
-                                />
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        type={showConfirmPassword ? 'text' : 'password'}
+                                        name="confirmPassword"
+                                        placeholder="Enter confirm password"
+                                        style={{
+                                            ...styles.input,
+                                            borderColor: errors.confirmPassword ? '#E53E3E' : 'var(--border-subtle)',
+                                            paddingRight: '45px'
+                                        }}
+                                        value={formData.confirmPassword}
+                                        onChange={handleChange}
+                                        className="auth-input"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        style={{
+                                            position: 'absolute',
+                                            right: '12px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            background: 'none',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            color: 'var(--text-muted)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            padding: '4px'
+                                        }}
+                                    >
+                                        {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    </button>
+                                </div>
                                 {errors.confirmPassword && <p style={styles.errorText}>{errors.confirmPassword}</p>}
                             </div>
                         </div>

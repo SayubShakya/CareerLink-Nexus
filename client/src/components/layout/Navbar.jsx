@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '@assets/images/temporary_logo.png';
 import { ROUTES } from '../../routes/routes';
+import authService from '@/services/authService';
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
+    const navigate = useNavigate();
+    const isAuthenticated = authService.isAuthenticated();
+    const role = localStorage.getItem('role');
 
     useEffect(() => {
         const handleScroll = () => {
@@ -13,6 +17,20 @@ export default function Navbar() {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    const handleLogout = async () => {
+        const confirmLogout = window.confirm("Are you sure you want to logout?");
+        if (confirmLogout) {
+            await authService.logout();
+            navigate('/');
+        }
+    };
+
+    const getDashboardRoute = () => {
+        if (role === 'job_seeker') return ROUTES.JOBSEEKER_DASHBOARD;
+        if (role === 'employeer') return ROUTES.EMPLOYER_DASHBOARD;
+        return '/';
+    };
 
     const navStyles = {
         brand: {
@@ -36,7 +54,8 @@ export default function Navbar() {
             color: 'var(--text-main)',
             textDecoration: 'none',
             opacity: 0.8,
-            transition: 'all 0.3s ease'
+            transition: 'all 0.3s ease',
+            cursor: 'pointer'
         },
         btn: {
             padding: '0.65rem 1.4rem',
@@ -48,6 +67,18 @@ export default function Navbar() {
             border: 'none',
             cursor: 'pointer',
             marginLeft: '10px'
+        },
+        logoutBtn: {
+            padding: '0.65rem 1.4rem',
+            backgroundColor: 'transparent',
+            color: '#C53030',
+            borderRadius: 'var(--radius-full)',
+            fontSize: '0.9rem',
+            fontWeight: '600',
+            border: '1px solid #FEB2B2',
+            cursor: 'pointer',
+            marginLeft: '10px',
+            transition: 'all 0.2s'
         }
     };
 
@@ -59,19 +90,26 @@ export default function Navbar() {
                 </Link>
 
                 <nav style={navStyles.navLinks} aria-label="Quick Links">
-                    <Link to="/" style={navStyles.link} className="nav-item" aria-label="Home">Home</Link>
-                    <Link to="/find-jobs" style={navStyles.link} className="nav-item" aria-label="Find Jobs">Find Jobs</Link>
-                    <Link to="/contact-us" style={navStyles.link} className="nav-item" aria-label="Contact Us">Contact Us</Link>
-                    <Link to={ROUTES.LOGIN} style={navStyles.link} className="nav-item" aria-label="Sign In">
-                        Sign In
-                    </Link>
-                    <Link
-                        to={ROUTES.REGISTER}
-                        style={{ ...navStyles.btn, textDecoration: 'none', display: 'inline-block' }}
-                        aria-label="Sign Up"
-                    >
-                        Sign Up
-                    </Link>
+                    <Link to="/" style={navStyles.link} className="nav-item">Home</Link>
+                    <Link to="/find-jobs" style={navStyles.link} className="nav-item">Find Jobs</Link>
+
+                    {isAuthenticated ? (
+                        <>
+                            <Link to={getDashboardRoute()} style={navStyles.link} className="nav-item">Dashboard</Link>
+                            <button onClick={handleLogout} style={navStyles.logoutBtn} className="logout-nav-btn">Logout</button>
+                        </>
+                    ) : (
+                        <>
+                            <Link to={ROUTES.LOGIN} style={navStyles.link} className="nav-item">Sign In</Link>
+                            <Link
+                                to={ROUTES.REGISTER}
+                                style={{ ...navStyles.btn, textDecoration: 'none', display: 'inline-block' }}
+                                className="signup-nav-btn"
+                            >
+                                Sign Up
+                            </Link>
+                        </>
+                    )}
                 </nav>
             </div>
 

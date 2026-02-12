@@ -15,12 +15,20 @@ const syncDatabase = async () => {
 
         console.log('✅ All tables synced successfully.');
 
+        // Rename 'employeer' to 'employer' if exists
+        const oldRole = await Role.findOne({ where: { name: 'employeer' } });
+        if (oldRole) {
+            oldRole.name = 'employer';
+            await oldRole.save();
+            console.log('✅ Renamed role "employeer" to "employer".');
+        }
+
         // Seed roles if not exist
         const count = await Role.count();
         if (count === 0) {
             await Role.bulkCreate([
                 { name: 'job_seeker' },
-                { name: 'employeer' }
+                { name: 'employer' }
             ]);
             console.log('✅ Default roles seeded.');
         }

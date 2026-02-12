@@ -1,18 +1,32 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import authIllustration from '@/assets/images/auth-illustration.png';
 import logo from '@assets/images/temporary_logo.png';
+import { Eye, EyeOff } from 'lucide-react';
 import authService from '@/services/authService';
+import { ROUTES } from '@/routes/routes';
+import { toast } from 'react-toastify';
 
 const Login = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [formData, setFormData] = useState({
         email: '',
         password: ''
     });
     const [errors, setErrors] = useState({});
     const [serverError, setServerError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
+    useEffect(() => {
+        if (location.state?.message) {
+            toast.success(location.state.message);
+            // Clear location state so message doesn't persist on reload
+            window.history.replaceState({}, document.title);
+        }
+    }, [location]);
 
     const styles = {
         pageContainer: {
@@ -88,15 +102,6 @@ const Login = () => {
             color: '#E53E3E',
             fontSize: '0.75rem',
             marginTop: '4px'
-        },
-        serverErrorBox: {
-            backgroundColor: '#FFF5F5',
-            border: '1px solid #FEB2B2',
-            borderRadius: '8px',
-            padding: '12px 16px',
-            marginBottom: '20px',
-            color: '#C53030',
-            fontSize: '0.85rem'
         },
         checkboxGroup: {
             display: 'flex',
@@ -182,11 +187,21 @@ const Login = () => {
         setServerError('');
 
         try {
-            await authService.login(formData.email, formData.password);
-            navigate('/');
+            const data = await authService.login(formData.email, formData.password);
+
+            toast.success('Login successful!');
+            // Redirect based on role
+            if (data.data.role === 'job_seeker') {
+                navigate(ROUTES.JOBSEEKER_DASHBOARD);
+            } else if (data.data.role === 'employer') {
+                navigate(ROUTES.EMPLOYER_DASHBOARD);
+            } else {
+                navigate('/');
+            }
         } catch (err) {
             const message = err.response?.data?.message || 'Login failed. Please try again.';
             setServerError(message);
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -216,8 +231,6 @@ const Login = () => {
                     <h2 style={styles.formTitle}>Log In</h2>
                     <p style={styles.formSubtitle}>Enter your credentials to access your account</p>
 
-                    {serverError && <div style={styles.serverErrorBox}>{serverError}</div>}
-
                     <form onSubmit={handleSubmit}>
                         <div style={styles.inputGroup}>
                             <label style={styles.label}>Email Address</label>
@@ -237,30 +250,45 @@ const Login = () => {
                         </div>
 
                         <div style={styles.inputGroup}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                <label style={{ ...styles.label, marginBottom: 0 }}>Password</label>
-                                <span style={{ ...styles.link, fontSize: '0.75rem' }}>Forgot password?</span>
+                            <label style={styles.label}>Password</label>
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    placeholder="Enter your password"
+                                    style={{
+                                        ...styles.input,
+                                        borderColor: errors.password ? '#E53E3E' : 'var(--border-subtle)',
+                                        paddingRight: '45px'
+                                    }}
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    className="auth-input"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    style={{
+                                        position: 'absolute',
+                                        right: '12px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        background: 'none',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        color: 'var(--text-muted)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        padding: '4px'
+                                    }}
+                                >
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
                             </div>
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Enter your password"
-                                style={{
-                                    ...styles.input,
-                                    borderColor: errors.password ? '#E53E3E' : 'var(--border-subtle)'
-                                }}
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="auth-input"
-                            />
                             {errors.password && <p style={styles.errorText}>{errors.password}</p>}
                         </div>
 
-                        <div style={styles.checkboxGroup}>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                                <input type="checkbox" /> Keep me signed in
-                            </label>
-                        </div>
+
 
                         <button type="submit" style={{ ...styles.submitBtn, opacity: loading ? 0.7 : 1 }} className="auth-submit-btn" disabled={loading}>
                             {loading ? 'Logging in...' : 'Log In'}

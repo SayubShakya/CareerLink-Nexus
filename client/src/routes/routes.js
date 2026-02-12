@@ -9,5 +9,9 @@ export const ROUTES = {
     REGISTER_EMPLOYER: '/register/employer',
     CONTACT_US: '/contact-us',
     PROFILE_SETUP: '/profile-setup',
+    JOBSEEKER_DASHBOARD: '/dashboard/jobseeker',
+    CV_BUILDER: '/dashboard/jobseeker/cv-builder',
+    APPLICATION_STATUS: '/dashboard/jobseeker/status',
+    EMPLOYER_DASHBOARD: '/dashboard/employer',
     NOT_FOUND: '*',
 };

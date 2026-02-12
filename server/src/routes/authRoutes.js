@@ -147,5 +147,6 @@ router.post('/register/employer', authController.registerEmployer);
  *         description: Incorrect email or password
  */
 router.post('/login', authController.login);
+router.post('/logout', authController.logout);
 
 module.exports = router;

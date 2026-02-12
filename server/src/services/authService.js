@@ -25,7 +25,7 @@ class AuthService {
 
         // Check Employer
         const employer = await Employer.findOne({ where: { email } });
-        if (employer) return { user: employer, role: 'employeer' };
+        if (employer) return { user: employer, role: 'employer' };
 
         return null;
     }
@@ -47,7 +47,7 @@ class AuthService {
      * Business logic for creating an employer
      */
     async createEmployer(userData) {
-        const role = await this.getRoleByName('employeer');
+        const role = await this.getRoleByName('employer');
 
         return await Employer.create({
             ...userData,

@@ -28,9 +28,12 @@ class AuthService {
         };
 
         const response = await api.post('/auth/register/job-seeker', payload);
+        // We no longer auto-login after registration as per user request
+        /*
         if (response.data.token) {
             this._setSession(response.data.token, response.data.data.user, response.data.data.role);
         }
+        */
         return response.data;
     }
 
@@ -47,19 +50,28 @@ class AuthService {
         };
 
         const response = await api.post('/auth/register/employer', payload);
+        // We no longer auto-login after registration as per user request
+        /*
         if (response.data.token) {
             this._setSession(response.data.token, response.data.data.user, response.data.data.role);
         }
+        */
         return response.data;
     }
 
     /**
      * Clear session data
      */
-    logout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('role');
+    async logout() {
+        try {
+            await api.post('/auth/logout');
+        } catch (err) {
+            console.error('Logout error:', err);
+        } finally {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('role');
+        }
     }
 
     /**

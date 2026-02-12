@@ -12,7 +12,7 @@ exports.registerJobSeeker = catchAsync(async (req, res, next) => {
 // 2. Register Employer
 exports.registerEmployer = catchAsync(async (req, res, next) => {
     const newUser = await authService.createEmployer(req.body);
-    createSendToken(newUser, 201, res, 'employeer');
+    createSendToken(newUser, 201, res, 'employer');
 });
 
 // 3. Login
@@ -37,6 +37,24 @@ exports.login = catchAsync(async (req, res, next) => {
         return next(new AppError('Incorrect email or password', 401));
     }
 
-    // 3) If everything ok, send token to client
+    // 3) Store user info in session
+    req.session.userId = user.id;
+    req.session.role = role;
+
+    // 4) If everything ok, send token to client
     createSendToken(user, 200, res, role);
+});
+
+// 4. Logout
+exports.logout = catchAsync(async (req, res, next) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return next(new AppError('Could not log out. Please try again.', 500));
+        }
+        res.clearCookie('connect.sid'); // Default cookie name for express-session
+        res.status(200).json({
+            status: 'success',
+            message: 'Logged out successfully'
+        });
+    });
 });
