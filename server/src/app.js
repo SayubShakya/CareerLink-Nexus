@@ -2,19 +2,21 @@
 const express = require('express');
 const cors = require('cors');
 const healthRoutes = require('./routes/healthRoutes');
+const roleRoutes = require('./routes/roleRoutes');
 const errorHandler = require('./middleware/errorHandler');
-const AppError = require('./utils/AppError');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpecs = require('./config/swagger');
 
 const app = express();
 
-// 1) Middleware
-app.use(cors({
-    origin: 'http://localhost:3000'
-}));
 app.use(express.json());
 
-// 2) Routes
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+
+// Routes
 app.use('/api/health', healthRoutes);
+app.use('/api/roles', roleRoutes);
 
 // Handle Undefined Routes
 app.all(/(.*)/, (req, res, next) => {

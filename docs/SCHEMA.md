@@ -6,7 +6,7 @@ This document defines the PostgreSQL database structure for the CareerLink Nexus
 | Column | Type | Constraints | Description |
 | :--- | :--- | :--- | :--- |
 | id | UUID | PRIMARY KEY | |
-| role | VARCHAR(50) | NOT NULL | 'job_seeker' or 'employeer' |
+| name | VARCHAR(50) | NOT NULL | 'job_seeker' or 'employeer' |
 | created_at | TIMESTAMP | DEFAULT NOW() | |
 | updated_at | TIMESTAMP | DEFAULT NOW() | |
 
