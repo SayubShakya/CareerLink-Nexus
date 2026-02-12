@@ -25,6 +25,11 @@ class CVService {
         return response.data.data.cv;
     }
 
+    async updateCV(id, data) {
+        const response = await api.patch(`/cvs/${id}`, data);
+        return response.data.data.cv;
+    }
+
     downloadUrl(id) {
         const token = localStorage.getItem('token');
         return `/api/cvs/${id}?token=${token}`; // Simplified download approach

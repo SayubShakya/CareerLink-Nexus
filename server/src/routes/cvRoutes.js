@@ -18,6 +18,7 @@ router.post('/upload', upload.single('file'), cvController.uploadCV);
 
 router.route('/:id')
     .delete(cvController.deleteCV)
-    .get(cvController.downloadCV);
+    .get(cvController.downloadCV)
+    .patch(cvController.updateCV);
 
 module.exports = router;

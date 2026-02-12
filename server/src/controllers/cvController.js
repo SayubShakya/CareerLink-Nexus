@@ -106,3 +106,29 @@ exports.uploadCV = catchAsync(async (req, res, next) => {
     });
 });
 
+// Update a CV
+exports.updateCV = catchAsync(async (req, res, next) => {
+    const cv = await CV.findOne({
+        where: { id: req.params.id, user_id: req.user.id }
+    });
+
+    if (!cv) {
+        return next(new AppError('No CV found with that ID', 404));
+    }
+
+    const { title, content, is_primary } = req.body;
+
+    if (title) cv.title = title;
+    if (content && cv.type === 'platform') cv.content = content;
+    if (is_primary !== undefined) cv.is_primary = is_primary;
+
+    await cv.save();
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            cv
+        }
+    });
+});
+

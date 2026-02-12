@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
     User,
     GraduationCap,
@@ -7,21 +7,46 @@ import {
     Trophy,
     BookOpen,
     Award,
-    Languages,
+    Languages as LangIcon,
     Users,
     Share2,
     Plus,
     Trash2,
-    ChevronDown,
-    ChevronUp,
     Layout,
     Download,
     Eye,
-    Crown
+    Crown,
+    Save,
+    MapPin,
+    Mail,
+    Phone,
+    Globe
 } from 'lucide-react';
+import { toast } from 'react-toastify';
+import cvService from '@/services/cvService';
+import { useSearchParams } from 'react-router-dom';
 
 const CVBuilder = () => {
+    const [searchParams] = useSearchParams();
+    const cvId = searchParams.get('id');
+
+    // --- PREMIUM DESIGN TOKENS (HSL) ---
+    const tokens = {
+        primary: '228 100% 63%', // Elite Blue
+        primaryDark: '228 100% 50%',
+        accent: '262 83% 58%', // Purple accent
+        bg: '210 20% 98%',
+        surface: '0 0% 100%',
+        textMain: '215 28% 17%',
+        textMuted: '215 16% 47%',
+        border: '214 32% 91%',
+        radiusLg: '20px',
+        radiusMd: '12px',
+        shadowPremium: '0 20px 40px -12px rgba(0,0,0,0.1)'
+    };
+
     const [cvData, setCvData] = useState({
+        title: 'Untitled CV',
         template: 'professional',
         about: {
             firstName: '',
@@ -40,11 +65,15 @@ const CVBuilder = () => {
         achievements: [''],
         trainings: [''],
         awards: [''],
-        languages: [''],
+        languages: [{ lang: '', level: 'Native' }],
         references: [{ name: '', position: '', contact: '' }]
     });
 
     const [activeSection, setActiveSection] = useState('about');
+    const [isSaving, setIsSaving] = useState(false);
+    const [isTitleEditing, setIsTitleEditing] = useState(false);
+    const middleScrollRef = useRef(null);
+
     const sectionsRef = {
         about: useRef(null),
         education: useRef(null),
@@ -53,433 +82,614 @@ const CVBuilder = () => {
         achievements: useRef(null),
         trainings: useRef(null),
         awards: useRef(null),
-        language: useRef(null),
-        reference: useRef(null)
+        languages: useRef(null),
+        references: useRef(null)
     };
+
+    // Load existing CV if ID present
+    useEffect(() => {
+        if (cvId) {
+            const fetchCV = async () => {
+                try {
+                    const cvs = await cvService.getAllCVs();
+                    const existing = cvs.find(c => c.id === cvId);
+                    if (existing && existing.content) {
+                        setCvData({
+                            ...existing.content,
+                            title: existing.title,
+                            id: existing.id
+                        });
+                    }
+                } catch (err) {
+                    toast.error("Error loading CV data");
+                }
+            };
+            fetchCV();
+        }
+    }, [cvId]);
+
+    // 2. Scroll Sync (Intersection Observer)
+    useEffect(() => {
+        const observerOptions = {
+            root: middleScrollRef.current,
+            rootMargin: '-20% 0px -70% 0px',
+            threshold: 0
+        };
+
+        const handleIntersection = (entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    setActiveSection(entry.target.id);
+                }
+            });
+        };
+
+        const observer = new IntersectionObserver(handleIntersection, observerOptions);
+        Object.values(sectionsRef).forEach(ref => {
+            if (ref.current) observer.observe(ref.current);
+        });
+
+        return () => observer.disconnect();
+    }, []);
 
     const scrollToSection = (sectionId) => {
         setActiveSection(sectionId);
         sectionsRef[sectionId]?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
-    const templates = [
-        { id: 'professional', name: 'Professional', isPremium: false },
-        { id: 'minimal', name: 'Minimal', isPremium: false },
-        { id: 'modern', name: 'Modern', isPremium: false },
-        { id: 'executive', name: 'Executive', isPremium: false },
-        { id: 'creative', name: 'Creative', isPremium: false },
-        { id: 'elite-gold', name: 'Elite Gold', isPremium: true },
-        { id: 'dark-mode', name: 'Premium Dark', isPremium: true }
-    ];
+    // --- State Handlers ---
+    const handleAboutChange = (field, value) => {
+        setCvData(prev => ({
+            ...prev,
+            about: { ...prev.about, [field]: value }
+        }));
+    };
+
+    const addItem = (section, initialValue) => {
+        setCvData(prev => ({
+            ...prev,
+            [section]: [...prev[section], { id: Date.now(), ...initialValue }]
+        }));
+    };
+
+    const removeItem = (section, id) => {
+        setCvData(prev => ({
+            ...prev,
+            [section]: prev[section].filter(item => item.id !== id)
+        }));
+    };
+
+    const updateItem = (section, id, field, value) => {
+        setCvData(prev => ({
+            ...prev,
+            [section]: prev[section].map(item => item.id === id ? { ...item, [field]: value } : item)
+        }));
+    };
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            if (cvId || cvData.id) {
+                await cvService.updateCV(cvId || cvData.id, {
+                    title: cvData.title,
+                    content: cvData
+                });
+            } else {
+                const saved = await cvService.createPlatformCV({
+                    title: cvData.title || `${cvData.about.firstName} CV`,
+                    content: cvData
+                });
+                setCvData(prev => ({ ...prev, id: saved.id }));
+            }
+            toast.success("CV Saved Successfully!");
+        } catch (err) {
+            toast.error("Failed to save CV");
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     const styles = {
         page: {
             display: 'grid',
-            gridTemplateColumns: '240px 1fr 450px',
+            gridTemplateColumns: '180px 0.9fr 1.3fr',
             height: 'calc(100vh - 64px)',
-            backgroundColor: '#F8F9FA'
+            backgroundColor: `hsl(${tokens.bg})`,
+            overflow: 'hidden',
+            fontFamily: "'Inter', system-ui, sans-serif"
         },
-        // 1. Sidebar
         sidebar: {
             backgroundColor: 'white',
-            borderRight: '1px solid #E5E7EB',
+            borderRight: `1px solid hsl(${tokens.border})`,
             overflowY: 'auto',
-            padding: '24px 12px'
+            padding: '40px 12px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px'
         },
         sidebarItem: (isActive) => ({
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
-            padding: '12px 16px',
-            borderRadius: '12px',
-            color: isActive ? 'var(--color-brand-primary)' : '#6B7280',
-            backgroundColor: isActive ? '#F3F6FF' : 'transparent',
-            fontWeight: isActive ? '700' : '600',
-            fontSize: '0.9rem',
+            padding: '14px 16px',
+            borderRadius: tokens.radiusMd,
+            color: isActive ? `hsl(${tokens.primary})` : `hsl(${tokens.textMuted})`,
+            backgroundColor: isActive ? `hsla(${tokens.primary}, 0.08)` : 'transparent',
+            fontWeight: isActive ? '800' : '600',
+            fontSize: '0.88rem',
             cursor: 'pointer',
-            marginBottom: '4px',
-            transition: 'all 0.2s'
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            transform: isActive ? 'translateX(4px)' : 'none'
         }),
-        // 2. Middle Section
         middle: {
-            padding: '40px',
-            overflowY: 'auto',
             backgroundColor: 'white',
-            borderRight: '1px solid #E5E7EB'
+            overflowY: 'auto',
+            padding: '0 40px 100px 40px',
+            scrollPaddingTop: '100px',
+            borderRight: `1px solid hsl(${tokens.border})`
         },
-        topBar: {
+        header: {
             position: 'sticky',
             top: 0,
-            backgroundColor: 'white',
-            zIndex: 10,
-            paddingBottom: '24px',
-            borderBottom: '1px solid #F3F4F6',
-            marginBottom: '32px'
-        },
-        templateSelector: {
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(10px)',
+            zIndex: 100,
+            padding: '30px 0',
+            borderBottom: `1px solid hsl(${tokens.border})`,
+            marginBottom: '50px',
             display: 'flex',
-            gap: '12px',
-            overflowX: 'auto',
-            paddingBottom: '8px'
+            justifyContent: 'space-between',
+            alignItems: 'center'
         },
-        templateBadge: (isSelected, isPremium) => ({
-            padding: '8px 16px',
-            borderRadius: '10px',
-            fontSize: '0.8rem',
-            fontWeight: '700',
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
+        titleInput: {
+            border: 'none',
+            background: 'transparent',
+            fontSize: '1.75rem',
+            fontWeight: '900',
+            color: `hsl(${tokens.textMain})`,
+            outline: 'none',
+            width: '100%',
+            maxWidth: '350px',
+            padding: '4px 0',
+            letterSpacing: '-0.04em',
+            transition: 'all 0.2s'
+        },
+        formSection: {
+            marginBottom: '80px',
+            scrollMarginTop: '120px'
+        },
+        sectionLabel: {
+            fontSize: '1.75rem',
+            fontWeight: '900',
+            marginBottom: '32px',
+            letterSpacing: '-0.04em',
+            color: `hsl(${tokens.textMain})`,
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
-            border: isSelected ? '2px solid var(--color-brand-primary)' : '1px solid #E5E7EB',
-            backgroundColor: isSelected ? '#F3F6FF' : 'white',
-            color: isSelected ? 'var(--color-brand-primary)' : '#4B5563'
-        }),
-        formSection: {
-            marginBottom: '48px',
-            scrollMarginTop: '100px'
+            gap: '16px'
         },
-        inputGroup: {
-            marginBottom: '20px'
-        },
-        label: {
-            display: 'block',
-            fontSize: '0.85rem',
-            fontWeight: '700',
-            color: '#374151',
-            marginBottom: '8px'
+        card: {
+            padding: '32px',
+            borderRadius: tokens.radiusLg,
+            border: `1px solid hsl(${tokens.border})`,
+            backgroundColor: 'white',
+            marginBottom: '24px',
+            position: 'relative',
+            boxShadow: '0 10px 15px -3px rgba(0,0,0,0.02)',
+            transition: 'all 0.3s ease'
         },
         input: {
             width: '100%',
-            padding: '12px 16px',
-            borderRadius: '10px',
-            border: '1px solid #E5E7EB',
+            padding: '16px 20px',
+            borderRadius: tokens.radiusMd,
+            border: `1.5px solid hsl(${tokens.border})`,
+            fontSize: '1rem',
             outline: 'none',
-            fontSize: '0.95rem',
-            transition: 'border-color 0.2s'
-        },
-        textarea: {
-            width: '100%',
-            padding: '12px 16px',
-            borderRadius: '10px',
-            border: '1px solid #E5E7EB',
-            outline: 'none',
-            fontSize: '0.95rem',
-            minHeight: '120px',
-            resize: 'vertical'
-        },
-        // 3. Right Section (Preview)
-        preview: {
-            padding: '40px 24px',
-            overflowY: 'auto',
-            backgroundColor: '#EDF0F5',
-            display: 'flex',
-            justifyContent: 'center'
-        },
-        cvPage: {
-            width: '100%',
-            minHeight: '580px',
+            transition: 'all 0.25s ease',
             backgroundColor: 'white',
-            boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-            padding: '40px',
-            fontSize: '0.75rem',
-            color: '#1F2937'
+            color: `hsl(${tokens.textMain})`,
+            fontFamily: 'inherit'
         },
-        actionBtn: {
+        previewPane: {
+            padding: '40px',
+            backgroundColor: '#E5E7EB',
+            overflowY: 'auto',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            gap: '8px',
-            padding: '8px 16px',
-            borderRadius: '8px',
-            backgroundColor: 'var(--color-brand-primary)',
+            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(0,0,0,0.05) 1px, transparent 0)`,
+            backgroundSize: '32px 32px'
+        },
+        cvPaper: {
+            width: '100%',
+            maxWidth: '820px',
+            minHeight: '1160px', // Proper A4 Ratio
+            backgroundColor: 'white',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+            padding: '60px 50px',
+            color: '#111827',
+            transition: 'all 0.3s ease',
+            margin: '0 auto'
+        },
+        btnPrimary: {
+            padding: '14px 28px',
+            borderRadius: tokens.radiusMd,
+            backgroundColor: `hsl(${tokens.primary})`,
             color: 'white',
+            fontWeight: '800',
             border: 'none',
             cursor: 'pointer',
-            fontWeight: '700',
-            fontSize: '0.85rem',
-            marginTop: '12px'
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            fontSize: '0.95rem',
+            boxShadow: `0 10px 20px -5px hsla(${tokens.primary}, 0.4)`,
+            transition: 'all 0.3s'
         }
-    };
-
-    const handleAboutChange = (field, value) => {
-        setCvData({
-            ...cvData,
-            about: { ...cvData.about, [field]: value }
-        });
-    };
-
-    const addEducation = () => {
-        setCvData({
-            ...cvData,
-            education: [...cvData.education, { id: Date.now(), degree: '', institute: '', year: '' }]
-        });
-    };
-
-    const updateEducation = (id, field, value) => {
-        const updated = cvData.education.map(edu =>
-            edu.id === id ? { ...edu, [field]: value } : edu
-        );
-        setCvData({ ...cvData, education: updated });
-    };
-
-    const removeEducation = (id) => {
-        setCvData({ ...cvData, education: cvData.education.filter(e => e.id !== id) });
-    };
-
-    const addExperience = () => {
-        setCvData({
-            ...cvData,
-            experience: [...cvData.experience, { id: Date.now(), role: '', company: '', duration: '', tasks: '' }]
-        });
-    };
-
-    const updateExperience = (id, field, value) => {
-        const updated = cvData.experience.map(exp =>
-            exp.id === id ? { ...exp, [field]: value } : exp
-        );
-        setCvData({ ...cvData, experience: updated });
     };
 
     return (
         <div style={styles.page}>
-            {/* 1. Left Sidebar Navigation */}
+            {/* Sidebar */}
             <aside style={styles.sidebar}>
-                <div style={{ marginBottom: '24px', paddingLeft: '16px' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: '900', color: 'var(--color-brand-primary)' }}>CV BUILDER</h3>
+                <div style={{ marginBottom: '40px', paddingLeft: '20px' }}>
+                    <h2 style={{ fontSize: '1.4rem', fontWeight: '1000', color: `hsl(${tokens.primary})`, letterSpacing: '-0.05em' }}>NEXUS BUILDER</h2>
                 </div>
                 {[
-                    { id: 'about', label: 'About', icon: <User size={18} /> },
-                    { id: 'education', label: 'Education', icon: <GraduationCap size={18} /> },
-                    { id: 'experience', label: 'Experience', icon: <Briefcase size={18} /> },
-                    { id: 'skills', label: 'Skills', icon: <Wrench size={18} /> },
-                    { id: 'achievements', label: 'Achievements', icon: <Trophy size={18} /> },
-                    { id: 'trainings', label: 'Trainings', icon: <BookOpen size={18} /> },
-                    { id: 'awards', label: 'Awards', icon: <Award size={18} /> },
-                    { id: 'language', label: 'Language', icon: <Languages size={18} /> },
-                    { id: 'reference', label: 'Reference', icon: <Users size={18} /> },
-                    { id: 'share', label: 'Share CV', icon: <Share2 size={18} /> }
+                    { id: 'about', label: 'Personal Details', icon: <User size={20} /> },
+                    { id: 'education', label: 'Education', icon: <GraduationCap size={20} /> },
+                    { id: 'experience', label: 'Experience', icon: <Briefcase size={20} /> },
+                    { id: 'skills', label: 'Expertise', icon: <Wrench size={20} /> },
+                    { id: 'achievements', label: 'Achievements', icon: <Trophy size={20} /> },
+                    { id: 'trainings', label: 'Certifications', icon: <BookOpen size={20} /> },
+                    { id: 'awards', label: 'Awards', icon: <Award size={20} /> },
+                    { id: 'languages', label: 'Languages', icon: <LangIcon size={20} /> },
+                    { id: 'references', label: 'References', icon: <Users size={20} /> },
                 ].map(item => (
                     <div
                         key={item.id}
                         style={styles.sidebarItem(activeSection === item.id)}
                         onClick={() => scrollToSection(item.id)}
                     >
-                        {item.icon}
-                        {item.label}
+                        {item.icon} {item.label}
                     </div>
                 ))}
             </aside>
 
-            {/* 2. Middle Input Form */}
-            <main style={styles.middle}>
-                <div style={styles.topBar}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                        <h2 style={{ fontWeight: '850', fontSize: '1.25rem' }}>Personalize Your Template</h2>
-                        <button style={{ ...styles.actionBtn, backgroundColor: '#10B981' }}><Download size={16} /> Download PDF</button>
+            {/* Form */}
+            <main style={styles.middle} ref={middleScrollRef}>
+                <header style={styles.header}>
+                    <div style={{ position: 'relative', flex: 1 }}>
+                        <input
+                            style={styles.titleInput}
+                            value={cvData.title}
+                            onFocus={() => setIsTitleEditing(true)}
+                            onBlur={() => setIsTitleEditing(false)}
+                            onChange={(e) => setCvData({ ...cvData, title: e.target.value })}
+                        />
+                        <div style={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            height: '2px',
+                            width: isTitleEditing ? '100%' : '0%',
+                            backgroundColor: `hsl(${tokens.primary})`,
+                            transition: 'width 0.3s'
+                        }} />
                     </div>
-                    <div style={styles.templateSelector}>
-                        {templates.map(t => (
-                            <div
-                                key={t.id}
-                                style={styles.templateBadge(cvData.template === t.id, t.isPremium)}
-                                onClick={() => setCvData({ ...cvData, template: t.id })}
-                            >
-                                <Layout size={14} />
-                                {t.name}
-                                {t.isPremium && <Crown size={12} color="#F59E0B" />}
-                            </div>
-                        ))}
+                    <div style={{ display: 'flex', gap: '16px' }}>
+                        <button onClick={handleSave} disabled={isSaving} style={styles.btnPrimary}>
+                            {isSaving ? 'Processing...' : <><Save size={18} /> Cloud Sync</>}
+                        </button>
+                        <button style={{ ...styles.btnPrimary, backgroundColor: '#10B981', boxShadow: '0 10px 20px -5px rgba(16, 185, 129, 0.4)' }}>
+                            <Download size={18} /> Export PDF
+                        </button>
                     </div>
-                </div>
+                </header>
 
-                <div style={{ paddingBottom: '100px' }}>
-                    {/* About Section */}
-                    <section ref={sectionsRef.about} style={styles.formSection}>
-                        <h3 style={{ fontSize: '1.4rem', fontWeight: '900', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <User color="var(--color-brand-primary)" /> About Yourself
-                        </h3>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                            <div style={styles.inputGroup}>
-                                <label style={styles.label}>First Name</label>
+                {/* About */}
+                <section id="about" ref={sectionsRef.about} style={styles.formSection}>
+                    <h3 style={styles.sectionLabel}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: `hsla(${tokens.primary}, 0.1)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <User size={20} color={`hsl(${tokens.primary})`} />
+                        </div>
+                        Describe Yourself
+                    </h3>
+                    <div style={styles.card}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                            <input style={styles.input} placeholder="First Name" value={cvData.about.firstName} onChange={(e) => handleAboutChange('firstName', e.target.value)} />
+                            <input style={styles.input} placeholder="Last Name" value={cvData.about.lastName} onChange={(e) => handleAboutChange('lastName', e.target.value)} />
+                        </div>
+                        <input style={{ ...styles.input, marginTop: '24px' }} placeholder="Headline (e.g. Senior Software Architect)" value={cvData.about.designation} onChange={(e) => handleAboutChange('designation', e.target.value)} />
+                        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '24px', marginTop: '24px' }}>
+                            <input style={styles.input} placeholder="Email" value={cvData.about.email} onChange={(e) => handleAboutChange('email', e.target.value)} />
+                            <input style={styles.input} placeholder="Phone" value={cvData.about.phone} onChange={(e) => handleAboutChange('phone', e.target.value)} />
+                        </div>
+                        <textarea
+                            style={{ ...styles.input, marginTop: '24px', minHeight: '160px', lineHeight: '1.6' }}
+                            placeholder="Write a compelling summary of your career..."
+                            value={cvData.about.summary}
+                            onChange={(e) => handleAboutChange('summary', e.target.value)}
+                        />
+                    </div>
+                </section>
+
+                {/* Education */}
+                <section id="education" ref={sectionsRef.education} style={styles.formSection}>
+                    <h3 style={styles.sectionLabel}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: `hsla(${tokens.primary}, 0.1)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <GraduationCap size={20} color={`hsl(${tokens.primary})`} />
+                        </div>
+                        Educational Background
+                    </h3>
+                    {cvData.education.map(edu => (
+                        <div key={edu.id} style={styles.card}>
+                            <button onClick={() => removeItem('education', edu.id)} style={{ position: 'absolute', top: '24px', right: '24px', border: 'none', background: 'transparent', color: '#EF4444', cursor: 'pointer', opacity: 0.6 }}><Trash2 size={20} /></button>
+                            <input style={{ ...styles.input, marginBottom: '20px', fontWeight: '700' }} placeholder="Degree / Qualification" value={edu.degree} onChange={(e) => updateItem('education', edu.id, 'degree', e.target.value)} />
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 150px', gap: '20px' }}>
+                                <input style={styles.input} placeholder="University / Institute" value={edu.institute} onChange={(e) => updateItem('education', edu.id, 'institute', e.target.value)} />
+                                <input style={styles.input} placeholder="Grad. Year" value={edu.year} onChange={(e) => updateItem('education', edu.id, 'year', e.target.value)} />
+                            </div>
+                        </div>
+                    ))}
+                    <button onClick={() => addItem('education', { degree: '', institute: '', year: '' })} style={{ ...styles.btnPrimary, background: 'transparent', color: `hsl(${tokens.primary})`, border: `2px dashed hsla(${tokens.primary}, 0.3)`, boxShadow: 'none' }}><Plus size={18} /> Add Qualification</button>
+                </section>
+
+                {/* Experience */}
+                <section id="experience" ref={sectionsRef.experience} style={styles.formSection}>
+                    <h3 style={styles.sectionLabel}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: `hsla(${tokens.primary}, 0.1)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Briefcase size={20} color={`hsl(${tokens.primary})`} />
+                        </div>
+                        Professional Experience
+                    </h3>
+                    {cvData.experience.map(exp => (
+                        <div key={exp.id} style={styles.card}>
+                            <button onClick={() => removeItem('experience', exp.id)} style={{ position: 'absolute', top: '24px', right: '24px', border: 'none', background: 'transparent', color: '#EF4444', cursor: 'pointer', opacity: 0.6 }}><Trash2 size={20} /></button>
+                            <input style={{ ...styles.input, marginBottom: '20px', fontWeight: '700' }} placeholder="Position / Role" value={exp.role} onChange={(e) => updateItem('experience', exp.id, 'role', e.target.value)} />
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 180px', gap: '20px', marginBottom: '20px' }}>
+                                <input style={styles.input} placeholder="Company / Organization" value={exp.company} onChange={(e) => updateItem('experience', exp.id, 'company', e.target.value)} />
+                                <input style={styles.input} placeholder="Date (e.g. 2021 - Present)" value={exp.duration} onChange={(e) => updateItem('experience', exp.id, 'duration', e.target.value)} />
+                            </div>
+                            <textarea style={{ ...styles.input, minHeight: '120px', lineHeight: '1.6' }} placeholder="Key responsibilities and achievements..." value={exp.tasks} onChange={(e) => updateItem('experience', exp.id, 'tasks', e.target.value)} />
+                        </div>
+                    ))}
+                    <button onClick={() => addItem('experience', { role: '', company: '', duration: '', tasks: '' })} style={{ ...styles.btnPrimary, background: 'transparent', color: `hsl(${tokens.primary})`, border: `2px dashed hsla(${tokens.primary}, 0.3)`, boxShadow: 'none' }}><Plus size={18} /> Add Experience</button>
+                </section>
+
+                {/* Skills */}
+                <section id="skills" ref={sectionsRef.skills} style={styles.formSection}>
+                    <h3 style={styles.sectionLabel}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: `hsla(${tokens.primary}, 0.1)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Wrench size={20} color={`hsl(${tokens.primary})`} />
+                        </div>
+                        Core Expertise
+                    </h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+                        {cvData.skills.map((s, i) => (
+                            <div key={i} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                                 <input
-                                    style={styles.input}
-                                    placeholder="e.g. Sayub"
-                                    onChange={(e) => handleAboutChange('firstName', e.target.value)}
-                                />
-                            </div>
-                            <div style={styles.inputGroup}>
-                                <label style={styles.label}>Last Name</label>
-                                <input
-                                    style={styles.input}
-                                    placeholder="e.g. Shakya"
-                                    onChange={(e) => handleAboutChange('lastName', e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <div style={styles.inputGroup}>
-                            <label style={styles.label}>Designation</label>
-                            <input
-                                style={styles.input}
-                                placeholder="e.g. Senior Frontend Engineer"
-                                onChange={(e) => handleAboutChange('designation', e.target.value)}
-                            />
-                        </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                            <div style={styles.inputGroup}>
-                                <label style={styles.label}>Email Address</label>
-                                <input style={styles.input} placeholder="name@example.com" onChange={(e) => handleAboutChange('email', e.target.value)} />
-                            </div>
-                            <div style={styles.inputGroup}>
-                                <label style={styles.label}>Phone Number</label>
-                                <input style={styles.input} placeholder="+977-9800000000" onChange={(e) => handleAboutChange('phone', e.target.value)} />
-                            </div>
-                        </div>
-                        <div style={styles.inputGroup}>
-                            <label style={styles.label}>Career Summary</label>
-                            <textarea style={styles.textarea} placeholder="Briefly describe your career goals and achievements..." onChange={(e) => handleAboutChange('summary', e.target.value)}></textarea>
-                        </div>
-                    </section>
-
-                    {/* Education Section */}
-                    <section ref={sectionsRef.education} style={styles.formSection}>
-                        <h3 style={{ fontSize: '1.4rem', fontWeight: '900', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <GraduationCap color="var(--color-brand-primary)" /> Education
-                        </h3>
-                        {cvData.education.map((edu, index) => (
-                            <div key={edu.id} style={{ padding: '20px', border: '1px solid #F3F4F6', borderRadius: '16px', marginBottom: '16px', position: 'relative' }}>
-                                <button
-                                    onClick={() => removeEducation(edu.id)}
-                                    style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer' }}
-                                >
-                                    <Trash2 size={18} />
-                                </button>
-                                <div style={styles.inputGroup}>
-                                    <label style={styles.label}>Degree / Program</label>
-                                    <input style={styles.input} placeholder="e.g. Bachelor in CS" value={edu.degree} onChange={(e) => updateEducation(edu.id, 'degree', e.target.value)} />
-                                </div>
-                                <div style={styles.inputGroup}>
-                                    <label style={styles.label}>Institute</label>
-                                    <input style={styles.input} placeholder="e.g. Tribhuvan University" value={edu.institute} onChange={(e) => updateEducation(edu.id, 'institute', e.target.value)} />
-                                </div>
-                                <div style={styles.inputGroup}>
-                                    <label style={styles.label}>Year of Graduation</label>
-                                    <input style={styles.input} placeholder="e.g. 2024" value={edu.year} onChange={(e) => updateEducation(edu.id, 'year', e.target.value)} />
-                                </div>
-                            </div>
-                        ))}
-                        <button style={styles.actionBtn} onClick={addEducation}><Plus size={16} /> Add Education</button>
-                    </section>
-
-                    {/* Experience Section */}
-                    <section ref={sectionsRef.experience} style={styles.formSection}>
-                        <h3 style={{ fontSize: '1.4rem', fontWeight: '900', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <Briefcase color="var(--color-brand-primary)" /> Job Experience
-                        </h3>
-                        {cvData.experience.map((exp) => (
-                            <div key={exp.id} style={{ padding: '20px', border: '1px solid #F3F4F6', borderRadius: '16px', marginBottom: '16px' }}>
-                                <div style={styles.inputGroup}>
-                                    <label style={styles.label}>Job Title / Role</label>
-                                    <input style={styles.input} placeholder="e.g. UX Designer" onChange={(e) => updateExperience(exp.id, 'role', e.target.value)} />
-                                </div>
-                                <div style={styles.inputGroup}>
-                                    <label style={styles.label}>Company Name</label>
-                                    <input style={styles.input} placeholder="e.g. Google" onChange={(e) => updateExperience(exp.id, 'company', e.target.value)} />
-                                </div>
-                                <div style={styles.inputGroup}>
-                                    <label style={styles.label}>Responsibilities</label>
-                                    <textarea style={styles.textarea} placeholder="Describe your key achievements..." onChange={(e) => updateExperience(exp.id, 'tasks', e.target.value)}></textarea>
-                                </div>
-                            </div>
-                        ))}
-                        <button style={styles.actionBtn} onClick={addExperience}><Plus size={16} /> Add Experience</button>
-                    </section>
-
-                    {/* Skills Section */}
-                    <section ref={sectionsRef.skills} style={styles.formSection}>
-                        <h3 style={{ fontSize: '1.4rem', fontWeight: '900', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <Wrench color="var(--color-brand-primary)" /> Technical Skills
-                        </h3>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                            {cvData.skills.map((skill, i) => (
-                                <input
-                                    key={i}
-                                    style={{ ...styles.input, width: '180px' }}
-                                    placeholder="e.g. React.js"
-                                    value={skill}
+                                    style={{ ...styles.input, width: '200px', fontWeight: '600', paddingRight: '44px' }}
+                                    value={s}
                                     onChange={(e) => {
-                                        const newSkills = [...cvData.skills];
-                                        newSkills[i] = e.target.value;
-                                        setCvData({ ...cvData, skills: newSkills });
+                                        const n = [...cvData.skills]; n[i] = e.target.value;
+                                        setCvData(prev => ({ ...prev, skills: n }));
                                     }}
                                 />
-                            ))}
-                            <button style={{ ...styles.actionBtn, marginTop: 0 }} onClick={() => setCvData({ ...cvData, skills: [...cvData.skills, ''] })}><Plus size={16} /></button>
+                                <button onClick={() => setCvData(prev => ({ ...prev, skills: prev.skills.filter((_, idx) => idx !== i) }))} style={{ position: 'absolute', right: '12px', border: 'none', background: 'transparent', color: '#9CA3AF', cursor: 'pointer' }}><Trash2 size={16} /></button>
+                            </div>
+                        ))}
+                        <button onClick={() => setCvData(prev => ({ ...prev, skills: [...prev.skills, ''] }))} style={{ ...styles.input, width: 'fit-content', borderStyle: 'dashed', fontWeight: '700' }}>+ Add Skill</button>
+                    </div>
+                </section>
+
+                {/* Achievements */}
+                <section id="achievements" ref={sectionsRef.achievements} style={styles.formSection}>
+                    <h3 style={styles.sectionLabel}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: `hsla(${tokens.primary}, 0.1)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Trophy size={20} color={`hsl(${tokens.primary})`} />
                         </div>
-                    </section>
-                </div>
+                        Career Milestones
+                    </h3>
+                    {cvData.achievements.map((a, i) => (
+                        <div key={i} style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                            <input style={styles.input} value={a} onChange={(e) => {
+                                const n = [...cvData.achievements]; n[i] = e.target.value;
+                                setCvData(prev => ({ ...prev, achievements: n }));
+                            }} placeholder="Significant accomplishment or metric-driven result..." />
+                            <button onClick={() => setCvData(prev => ({ ...prev, achievements: prev.achievements.filter((_, idx) => idx !== i) }))} style={{ color: '#EF4444', border: 'none', background: 'transparent', cursor: 'pointer' }}><Trash2 size={20} /></button>
+                        </div>
+                    ))}
+                    <button onClick={() => setCvData(prev => ({ ...prev, achievements: [...prev.achievements, ''] }))} style={{ ...styles.btnPrimary, background: 'transparent', color: `hsl(${tokens.primary})`, border: `2px dashed hsla(${tokens.primary}, 0.3)`, boxShadow: 'none' }}>+ Add Achievement</button>
+                </section>
+
+                {/* Trainings */}
+                <section id="trainings" ref={sectionsRef.trainings} style={styles.formSection}>
+                    <h3 style={styles.sectionLabel}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: `hsla(${tokens.primary}, 0.1)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <BookOpen size={20} color={`hsl(${tokens.primary})`} />
+                        </div>
+                        Certifications & Training
+                    </h3>
+                    {cvData.trainings.map((t, i) => (
+                        <div key={i} style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                            <input style={styles.input} value={t} onChange={(e) => {
+                                const n = [...cvData.trainings]; n[i] = e.target.value;
+                                setCvData(prev => ({ ...prev, trainings: n }));
+                            }} placeholder="License, Certification, or Course Title..." />
+                            <button onClick={() => setCvData(prev => ({ ...prev, trainings: prev.trainings.filter((_, idx) => idx !== i) }))} style={{ color: '#EF4444', border: 'none', background: 'transparent', cursor: 'pointer' }}><Trash2 size={20} /></button>
+                        </div>
+                    ))}
+                    <button onClick={() => setCvData(prev => ({ ...prev, trainings: [...prev.trainings, ''] }))} style={{ ...styles.btnPrimary, background: 'transparent', color: `hsl(${tokens.primary})`, border: `2px dashed hsla(${tokens.primary}, 0.3)`, boxShadow: 'none' }}>+ Add Certification</button>
+                </section>
+
+                {/* Languages */}
+                <section id="languages" ref={sectionsRef.languages} style={styles.formSection}>
+                    <h3 style={styles.sectionLabel}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: `hsla(${tokens.primary}, 0.1)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <LangIcon size={20} color={`hsl(${tokens.primary})`} />
+                        </div>
+                        Linguistic Skills
+                    </h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                        {cvData.languages.map((l, i) => (
+                            <div key={i} style={{ display: 'flex', gap: '12px' }}>
+                                <input style={styles.input} value={l.lang} placeholder="Language" onChange={(e) => {
+                                    const n = [...cvData.languages]; n[i].lang = e.target.value;
+                                    setCvData(prev => ({ ...prev, languages: n }));
+                                }} />
+                                <select
+                                    style={{ ...styles.input, width: '180px', cursor: 'pointer' }}
+                                    value={l.level}
+                                    onChange={(e) => {
+                                        const n = [...cvData.languages]; n[i].level = e.target.value;
+                                        setCvData(prev => ({ ...prev, languages: n }));
+                                    }}
+                                >
+                                    <option>Native</option>
+                                    <option>Fluent</option>
+                                    <option>Professional</option>
+                                    <option>Intermediate</option>
+                                    <option>Elementary</option>
+                                </select>
+                            </div>
+                        ))}
+                    </div>
+                    <button onClick={() => setCvData(prev => ({ ...prev, languages: [...prev.languages, { lang: '', level: 'Native' }] }))} style={{ ...styles.btnPrimary, background: 'transparent', color: `hsl(${tokens.primary})`, border: `2px dashed hsla(${tokens.primary}, 0.3)`, boxShadow: 'none', marginTop: '24px' }}>+ Add Language</button>
+                </section>
+
+                {/* References */}
+                <section id="references" ref={sectionsRef.references} style={styles.formSection}>
+                    <h3 style={styles.sectionLabel}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: `hsla(${tokens.primary}, 0.1)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Users size={20} color={`hsl(${tokens.primary})`} />
+                        </div>
+                        Endorsements
+                    </h3>
+                    {cvData.references.map((rf, i) => (
+                        <div key={i} style={styles.card}>
+                            <button onClick={() => setCvData(prev => ({ ...prev, references: prev.references.filter((_, idx) => idx !== i) }))} style={{ position: 'absolute', top: '24px', right: '24px', border: 'none', background: 'transparent', color: '#EF4444', cursor: 'pointer' }}><Trash2 size={20} /></button>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                                <input style={styles.input} placeholder="Reference Name" value={rf.name} onChange={(e) => {
+                                    const n = [...cvData.references]; n[i].name = e.target.value;
+                                    setCvData(prev => ({ ...prev, references: n }));
+                                }} />
+                                <input style={styles.input} placeholder="Position / Connection" value={rf.position} onChange={(e) => {
+                                    const n = [...cvData.references]; n[i].position = e.target.value;
+                                    setCvData(prev => ({ ...prev, references: n }));
+                                }} />
+                            </div>
+                            <input style={styles.input} placeholder="Phone or Email Contact" value={rf.contact} onChange={(e) => {
+                                const n = [...cvData.references]; n[i].contact = e.target.value;
+                                setCvData(prev => ({ ...prev, references: n }));
+                            }} />
+                        </div>
+                    ))}
+                    <button onClick={() => setCvData(prev => ({ ...prev, references: [...prev.references, { name: '', position: '', contact: '' }] }))} style={{ ...styles.btnPrimary, background: 'transparent', color: `hsl(${tokens.primary})`, border: `2px dashed hsla(${tokens.primary}, 0.3)`, boxShadow: 'none' }}>+ Add Reference</button>
+                </section>
             </main>
 
-            {/* 3. Right Side Live Preview */}
-            <section style={styles.preview}>
-                <div style={styles.cvPage}>
-                    <div style={{ borderBottom: '2px solid var(--color-brand-primary)', paddingBottom: '20px', marginBottom: '20px' }}>
-                        <h1 style={{ fontSize: '1.8rem', fontWeight: '900', margin: 0, textTransform: 'uppercase' }}>
-                            {cvData.about.firstName || 'YOUR'} {cvData.about.lastName || 'NAME'}
-                        </h1>
-                        <p style={{ color: 'var(--color-brand-accent)', fontSize: '0.9rem', fontWeight: '700', marginTop: '4px' }}>
-                            {cvData.about.designation || 'Your Position'}
-                        </p>
-                        <div style={{ display: 'flex', gap: '16px', marginTop: '12px', fontSize: '0.7rem', color: '#6B7280' }}>
-                            {cvData.about.email && <span>{cvData.about.email}</span>}
-                            {cvData.about.phone && <span>{cvData.about.phone}</span>}
+            {/* --- LIVE PREVIEW --- */}
+            <section style={styles.previewPane}>
+                <div style={styles.cvPaper}>
+                    {/* Header */}
+                    <header style={{ borderBottom: `4px solid hsl(${tokens.primary})`, paddingBottom: '30px', marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                        <div>
+                            <h1 style={{ fontSize: '3rem', fontWeight: '1000', color: `hsl(${tokens.textMain})`, letterSpacing: '-0.06em', margin: 0, lineHeight: 1 }}>
+                                {cvData.about.firstName} <span style={{ color: `hsl(${tokens.primary})` }}>{cvData.about.lastName}</span>
+                            </h1>
+                            <p style={{ fontSize: '1.25rem', fontWeight: '800', color: `hsl(${tokens.textMuted})`, marginTop: '12px', letterSpacing: '-0.02em' }}>{cvData.about.designation}</p>
                         </div>
-                    </div>
-
-                    {/* Summary */}
-                    {cvData.about.summary && (
-                        <div style={{ marginBottom: '20px' }}>
-                            <h4 style={{ fontWeight: '800', borderBottom: '1px solid #E5E7EB', paddingBottom: '4px', marginBottom: '8px', textTransform: 'uppercase' }}>Summary</h4>
-                            <p style={{ lineHeight: '1.6', color: '#4B5563' }}>{cvData.about.summary}</p>
+                        <div style={{ textAlign: 'right', fontSize: '0.85rem', color: `hsl(${tokens.textMuted})`, fontWeight: '600' }}>
+                            {cvData.about.email && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', marginBottom: '4px' }}>{cvData.about.email} <Mail size={14} /></div>}
+                            {cvData.about.phone && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', marginBottom: '4px' }}>{cvData.about.phone} <Phone size={14} /></div>}
+                            {cvData.about.address && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>{cvData.about.address} <MapPin size={14} /></div>}
                         </div>
-                    )}
+                    </header>
 
-                    {/* Experience Preview */}
-                    <div style={{ marginBottom: '20px' }}>
-                        <h4 style={{ fontWeight: '800', borderBottom: '1px solid #E5E7EB', paddingBottom: '4px', marginBottom: '8px', textTransform: 'uppercase' }}>Experience</h4>
-                        {cvData.experience.map(exp => (exp.role || exp.company) && (
-                            <div key={exp.id} style={{ marginBottom: '12px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '700' }}>
-                                    <span>{exp.role || 'Job Title'}</span>
-                                    <span>{exp.duration}</span>
+                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '50px' }}>
+                        {/* Main Stream */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
+                            {/* Summary */}
+                            {cvData.about.summary && (
+                                <div>
+                                    <h4 style={{ fontSize: '1rem', fontWeight: '1000', color: `hsl(${tokens.primary})`, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '16px' }}>Executive Summary</h4>
+                                    <p style={{ fontSize: '0.92rem', lineHeight: '1.7', color: `hsl(${tokens.textMain})`, textAlign: 'justify' }}>{cvData.about.summary}</p>
                                 </div>
-                                <p style={{ color: '#6B7280', fontWeight: '600' }}>{exp.company}</p>
-                                <p style={{ marginTop: '4px' }}>{exp.tasks}</p>
-                            </div>
-                        ))}
-                    </div>
+                            )}
 
-                    {/* Education Preview */}
-                    <div style={{ marginBottom: '20px' }}>
-                        <h4 style={{ fontWeight: '800', borderBottom: '1px solid #E5E7EB', paddingBottom: '4px', marginBottom: '8px', textTransform: 'uppercase' }}>Education</h4>
-                        {cvData.education.map(edu => (edu.degree || edu.institute) && (
-                            <div key={edu.id} style={{ marginBottom: '12px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '700' }}>
-                                    <span>{edu.degree}</span>
-                                    <span>{edu.year}</span>
+                            {/* Experience */}
+                            {cvData.experience.length > 0 && cvData.experience[0].role && (
+                                <div>
+                                    <h4 style={{ fontSize: '1rem', fontWeight: '1000', color: `hsl(${tokens.primary})`, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '20px' }}>Professional Tenure</h4>
+                                    {cvData.experience.map(exp => (
+                                        <div key={exp.id} style={{ marginBottom: '24px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                                <h5 style={{ fontWeight: '900', fontSize: '1.05rem', margin: 0 }}>{exp.role}</h5>
+                                                <span style={{ fontSize: '0.8rem', fontWeight: '700', color: `hsl(${tokens.textMuted})` }}>{exp.duration}</span>
+                                            </div>
+                                            <h6 style={{ fontSize: '0.9rem', fontWeight: '700', color: `hsl(${tokens.primaryDark})`, margin: '4px 0 12px 0' }}>{exp.company}</h6>
+                                            <p style={{ fontSize: '0.88rem', lineHeight: '1.6', color: `hsl(${tokens.textMain})`, whiteSpace: 'pre-line' }}>{exp.tasks}</p>
+                                        </div>
+                                    ))}
                                 </div>
-                                <p style={{ color: '#6B7280' }}>{edu.institute}</p>
-                            </div>
-                        ))}
-                    </div>
+                            )}
 
-                    {/* Skills Preview */}
-                    <div>
-                        <h4 style={{ fontWeight: '800', borderBottom: '1px solid #E5E7EB', paddingBottom: '4px', marginBottom: '8px', textTransform: 'uppercase' }}>Skills</h4>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                            {cvData.skills.filter(s => s).map((s, i) => (
-                                <span key={i} style={{ backgroundColor: '#F3F4F6', padding: '4px 8px', borderRadius: '4px', fontSize: '0.65rem' }}>{s}</span>
-                            ))}
+                            {/* Education */}
+                            {cvData.education.length > 0 && cvData.education[0].degree && (
+                                <div>
+                                    <h4 style={{ fontSize: '1rem', fontWeight: '1000', color: `hsl(${tokens.primary})`, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '20px' }}>Education</h4>
+                                    {cvData.education.map(edu => (
+                                        <div key={edu.id} style={{ marginBottom: '16px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <h5 style={{ fontWeight: '900', fontSize: '1rem', margin: 0 }}>{edu.degree}</h5>
+                                                <span style={{ fontSize: '0.8rem', fontWeight: '800' }}>{edu.year}</span>
+                                            </div>
+                                            <p style={{ fontSize: '0.9rem', color: `hsl(${tokens.textMuted})`, fontWeight: '600' }}>{edu.institute}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Sidebar Stream */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                            {/* Skills */}
+                            {cvData.skills.length > 0 && cvData.skills[0] && (
+                                <div>
+                                    <h4 style={{ fontSize: '0.9rem', fontWeight: '1000', color: `hsl(${tokens.primary})`, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '16px' }}>Core Expertise</h4>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                        {cvData.skills.filter(s => s).map((s, i) => (
+                                            <span key={i} style={{ backgroundColor: `hsla(${tokens.primary}, 0.06)`, color: `hsl(${tokens.primaryDark})`, padding: '6px 12px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: '800', border: `1px solid hsla(${tokens.primary}, 0.1)` }}>{s}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Milestones */}
+                            {cvData.achievements.length > 0 && cvData.achievements[0] && (
+                                <div>
+                                    <h4 style={{ fontSize: '0.9rem', fontWeight: '1000', color: `hsl(${tokens.primary})`, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '16px' }}>Milestones</h4>
+                                    <ul style={{ paddingLeft: '18px', color: `hsl(${tokens.textMain})`, fontSize: '0.82rem', lineHeight: '1.6' }}>
+                                        {cvData.achievements.filter(a => a).map((a, i) => (
+                                            <li key={i} style={{ marginBottom: '8px', fontWeight: '500' }}>{a}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {/* Languages */}
+                            {cvData.languages.length > 0 && cvData.languages[0].lang && (
+                                <div>
+                                    <h4 style={{ fontSize: '0.9rem', fontWeight: '1000', color: `hsl(${tokens.primary})`, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '16px' }}>Languages</h4>
+                                    {cvData.languages.filter(l => l.lang).map((l, i) => (
+                                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '8px' }}>
+                                            <span style={{ fontWeight: '800', color: `hsl(${tokens.textMain})` }}>{l.lang}</span>
+                                            <span style={{ color: `hsl(${tokens.textMuted})`, fontWeight: '700' }}>{l.level}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
