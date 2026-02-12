@@ -1,16 +1,20 @@
 const sequelize = require('./config/sequelize');
 const Role = require('./models/Role');
+const JobSeeker = require('./models/JobSeeker');
+const Employer = require('./models/Employer');
 
 const syncDatabase = async () => {
     try {
         await sequelize.authenticate();
         console.log('✅ Connected to database.');
 
-        // Sync models
+        // Sync models (Order matters for foreign keys)
         await Role.sync({ alter: true }); // Updates table safely without dropping data
-        console.log('✅ Role table synced successfully.');
+        await JobSeeker.sync({ alter: true });
+        await Employer.sync({ alter: true });
 
-        // Seed roles if not exist
+        console.log('✅ All tables synced successfully.');
+
         // Seed roles if not exist
         const count = await Role.count();
         if (count === 0) {

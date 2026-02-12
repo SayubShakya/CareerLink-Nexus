@@ -1,0 +1,151 @@
+const express = require('express');
+const authController = require('../controllers/authController');
+
+const router = express.Router();
+
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Authentication & Registration
+ */
+
+/**
+ * @swagger
+ * /api/auth/register/job-seeker:
+ *   post:
+ *     summary: Register a new Job Seeker
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - first_name
+ *               - last_name
+ *               - email
+ *               - password
+ *             properties:
+ *               first_name:
+ *                 type: string
+ *                 example: John
+ *               last_name:
+ *                 type: string
+ *                 example: Doe
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: john@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: password123
+ *     responses:
+ *       201:
+ *         description: Job Seeker registered successfully
+ *       400:
+ *         description: Validation error or email already exists
+ *       500:
+ *         description: Server error
+ */
+router.post('/register/job-seeker', authController.registerJobSeeker);
+
+/**
+ * @swagger
+ * /api/auth/register/employer:
+ *   post:
+ *     summary: Register a new Employer
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - organization_name
+ *               - company_website
+ *               - email
+ *               - password
+ *             properties:
+ *               organization_name:
+ *                 type: string
+ *                 example: Tech Corp
+ *               company_website:
+ *                 type: string
+ *                 format: url
+ *                 example: https://techcorp.com
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: hr@techcorp.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: password123
+ *     responses:
+ *       201:
+ *         description: Employer registered successfully
+ *       400:
+ *         description: Validation error or email already exists
+ *       500:
+ *         description: Server error
+ */
+router.post('/register/employer', authController.registerEmployer);
+
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Login for both Job Seekers & Employers
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: john@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         description: Login successful. Returns JWT token and user data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       type: object
+ *                     role:
+ *                       type: string
+ *                       example: job_seeker
+ *       400:
+ *         description: Missing email or password
+ *       401:
+ *         description: Incorrect email or password
+ */
+router.post('/login', authController.login);
+
+module.exports = router;
