@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import authIllustration from '@/assets/images/auth-illustration.png';
 import logo from '@assets/images/temporary_logo.png';
+import api from '@/services/api';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -10,6 +11,8 @@ const Login = () => {
         password: ''
     });
     const [errors, setErrors] = useState({});
+    const [serverError, setServerError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const styles = {
         pageContainer: {
@@ -86,6 +89,15 @@ const Login = () => {
             fontSize: '0.75rem',
             marginTop: '4px'
         },
+        serverErrorBox: {
+            backgroundColor: '#FFF5F5',
+            border: '1px solid #FEB2B2',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            marginBottom: '20px',
+            color: '#C53030',
+            fontSize: '0.85rem'
+        },
         checkboxGroup: {
             display: 'flex',
             justifyContent: 'space-between',
@@ -105,7 +117,8 @@ const Login = () => {
             fontWeight: '600',
             cursor: 'pointer',
             marginBottom: '20px',
-            transition: 'background-color 0.2s'
+            transition: 'background-color 0.2s',
+            opacity: 1
         },
         googleBtn: {
             width: '100%',
@@ -155,17 +168,36 @@ const Login = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
-        // Clear error when user starts typing
         if (errors[name]) {
             setErrors({ ...errors, [name]: '' });
         }
+        if (serverError) setServerError('');
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validate()) {
-            console.log("Logging in...", formData);
-            // navigate('/');
+        if (!validate()) return;
+
+        setLoading(true);
+        setServerError('');
+
+        try {
+            const res = await api.post('/auth/login', {
+                email: formData.email,
+                password: formData.password
+            });
+
+            // Store token and user data
+            localStorage.setItem('token', res.data.token);
+            localStorage.setItem('user', JSON.stringify(res.data.data.user));
+            localStorage.setItem('role', res.data.data.role);
+
+            navigate('/');
+        } catch (err) {
+            const message = err.response?.data?.message || 'Login failed. Please try again.';
+            setServerError(message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -192,6 +224,8 @@ const Login = () => {
                 <div style={styles.rightColumn}>
                     <h2 style={styles.formTitle}>Log In</h2>
                     <p style={styles.formSubtitle}>Enter your credentials to access your account</p>
+
+                    {serverError && <div style={styles.serverErrorBox}>{serverError}</div>}
 
                     <form onSubmit={handleSubmit}>
                         <div style={styles.inputGroup}>
@@ -237,8 +271,8 @@ const Login = () => {
                             </label>
                         </div>
 
-                        <button type="submit" style={styles.submitBtn} className="auth-submit-btn">
-                            Log In
+                        <button type="submit" style={{ ...styles.submitBtn, opacity: loading ? 0.7 : 1 }} className="auth-submit-btn" disabled={loading}>
+                            {loading ? 'Logging in...' : 'Log In'}
                         </button>
 
                         <div style={{ textAlign: 'center', margin: '20px 0', fontSize: '0.8rem', color: '#CBD5E0', position: 'relative' }}>

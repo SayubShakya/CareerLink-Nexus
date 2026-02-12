@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import authIllustration from '@/assets/images/auth-illustration.png';
 import logo from '@assets/images/temporary_logo.png';
 import { ROUTES } from '@/routes/routes';
+import api from '@/services/api';
 
 const styles = {
     pageContainer: {
@@ -86,6 +87,15 @@ const styles = {
         fontSize: '0.75rem',
         marginTop: '4px'
     },
+    serverErrorBox: {
+        backgroundColor: '#FFF5F5',
+        border: '1px solid #FEB2B2',
+        borderRadius: '8px',
+        padding: '12px 16px',
+        marginBottom: '20px',
+        color: '#C53030',
+        fontSize: '0.85rem'
+    },
     checkboxGroup: {
         display: 'flex',
         alignItems: 'flex-start',
@@ -144,6 +154,8 @@ const JobseekerSignup = () => {
         terms: false
     });
     const [errors, setErrors] = useState({});
+    const [serverError, setServerError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const validate = () => {
         const newErrors = {};
@@ -172,14 +184,34 @@ const JobseekerSignup = () => {
             [name]: type === 'checkbox' ? checked : value
         }));
         if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+        if (serverError) setServerError('');
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validate()) {
-            console.log("Creating jobseeker account...", formData);
-            // API integration here
+        if (!validate()) return;
+
+        setLoading(true);
+        setServerError('');
+
+        try {
+            const res = await api.post('/auth/register/job-seeker', {
+                first_name: formData.firstName,
+                last_name: formData.lastName,
+                email: formData.email,
+                password: formData.password
+            });
+
+            localStorage.setItem('token', res.data.token);
+            localStorage.setItem('user', JSON.stringify(res.data.data.user));
+            localStorage.setItem('role', res.data.data.role);
+
             navigate('/profile-setup');
+        } catch (err) {
+            const message = err.response?.data?.message || 'Registration failed. Please try again.';
+            setServerError(message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -212,6 +244,8 @@ const JobseekerSignup = () => {
 
                     <h2 style={styles.formTitle}>Sign Up</h2>
                     <p style={styles.formSubtitle}>Create your seeker account</p>
+
+                    {serverError && <div style={styles.serverErrorBox}>{serverError}</div>}
 
                     <form onSubmit={handleSubmit}>
                         <div style={styles.row} className="form-row">
@@ -318,8 +352,8 @@ const JobseekerSignup = () => {
                             </div>
                         </div>
 
-                        <button type="submit" style={styles.submitBtn} className="auth-submit-btn">
-                            Create Seeker Account
+                        <button type="submit" style={{ ...styles.submitBtn, opacity: loading ? 0.7 : 1 }} className="auth-submit-btn" disabled={loading}>
+                            {loading ? 'Creating Account...' : 'Create Seeker Account'}
                         </button>
 
                         <p style={styles.switchText}>

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import authIllustration from '@/assets/images/auth-illustration.png';
 import logo from '@assets/images/temporary_logo.png';
 import { ROUTES } from '@/routes/routes';
+import api from '@/services/api';
 
 const styles = {
     pageContainer: {
@@ -86,6 +87,15 @@ const styles = {
         fontSize: '0.75rem',
         marginTop: '4px'
     },
+    serverErrorBox: {
+        backgroundColor: '#FFF5F5',
+        border: '1px solid #FEB2B2',
+        borderRadius: '8px',
+        padding: '12px 16px',
+        marginBottom: '20px',
+        color: '#C53030',
+        fontSize: '0.85rem'
+    },
     checkboxGroup: {
         display: 'flex',
         alignItems: 'flex-start',
@@ -147,11 +157,11 @@ const EmployerSignup = () => {
         terms: false
     });
     const [errors, setErrors] = useState({});
+    const [serverError, setServerError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const validate = () => {
         const newErrors = {};
-        if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-        if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
         if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required';
         if (!formData.companyWebsite.trim()) newErrors.companyWebsite = 'Company website is required';
         if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
@@ -177,14 +187,40 @@ const EmployerSignup = () => {
             [name]: type === 'checkbox' ? checked : value
         }));
         if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+        if (serverError) setServerError('');
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validate()) {
-            console.log("Creating employer account...", formData);
-            // API integration here
+        if (!validate()) return;
+
+        setLoading(true);
+        setServerError('');
+
+        // Ensure website has protocol
+        let website = formData.companyWebsite;
+        if (!/^https?:\/\//i.test(website)) {
+            website = 'https://' + website;
+        }
+
+        try {
+            const res = await api.post('/auth/register/employer', {
+                organization_name: formData.companyName,
+                company_website: website,
+                email: formData.email,
+                password: formData.password
+            });
+
+            localStorage.setItem('token', res.data.token);
+            localStorage.setItem('user', JSON.stringify(res.data.data.user));
+            localStorage.setItem('role', res.data.data.role);
+
             navigate('/profile-setup');
+        } catch (err) {
+            const message = err.response?.data?.message || 'Registration failed. Please try again.';
+            setServerError(message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -217,6 +253,8 @@ const EmployerSignup = () => {
 
                     <h2 style={styles.formTitle}>Sign Up</h2>
                     <p style={styles.formSubtitle}>Create your employer account</p>
+
+                    {serverError && <div style={styles.serverErrorBox}>{serverError}</div>}
 
                     <form onSubmit={handleSubmit}>
 
@@ -336,8 +374,8 @@ const EmployerSignup = () => {
                             </div>
                         </div>
 
-                        <button type="submit" style={styles.submitBtn} className="auth-submit-btn">
-                            Create Employer Account
+                        <button type="submit" style={{ ...styles.submitBtn, opacity: loading ? 0.7 : 1 }} className="auth-submit-btn" disabled={loading}>
+                            {loading ? 'Creating Account...' : 'Create Employer Account'}
                         </button>
 
                         <p style={styles.switchText}>
