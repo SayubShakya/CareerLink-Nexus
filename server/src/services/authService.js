@@ -34,6 +34,12 @@ class AuthService {
      * Business logic for creating a job seeker
      */
     async createJobSeeker(userData) {
+        // Check if user exists in either table
+        const existingUser = await this.findUserByEmail(userData.email);
+        if (existingUser) {
+            throw new AppError('Email already in use. Please use a different email or log in.', 400);
+        }
+
         const role = await this.getRoleByName('job_seeker');
 
         return await JobSeeker.create({
@@ -47,6 +53,12 @@ class AuthService {
      * Business logic for creating an employer
      */
     async createEmployer(userData) {
+        // Check if user exists in either table
+        const existingUser = await this.findUserByEmail(userData.email);
+        if (existingUser) {
+            throw new AppError('Email already in use. Please use a different email or log in.', 400);
+        }
+
         const role = await this.getRoleByName('employer');
 
         return await Employer.create({

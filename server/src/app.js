@@ -10,6 +10,8 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./config/swagger');
 
 const app = express();
+const jobSeekerRoutes = require('./routes/jobSeekerRoutes');
+const employerRoutes = require('./routes/employerRoutes');
 
 // Global Middleware
 app.use(cors({
@@ -37,6 +39,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 app.use('/api/health', healthRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/job-seekers', jobSeekerRoutes);
+app.use('/api/employers', employerRoutes);
 
 // Handle Undefined Routes
 app.all(/(.*)/, (req, res, next) => {

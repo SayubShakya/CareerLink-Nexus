@@ -18,17 +18,13 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const handleLogout = async () => {
-        const confirmLogout = window.confirm("Are you sure you want to logout?");
-        if (confirmLogout) {
-            await authService.logout();
-            navigate('/');
-        }
+    const handleLogout = () => {
+        navigate(ROUTES.LOGOUT_CONFIRMATION);
     };
 
     const getDashboardRoute = () => {
         if (role === 'job_seeker') return ROUTES.JOBSEEKER_DASHBOARD;
-        if (role === 'employeer') return ROUTES.EMPLOYER_DASHBOARD;
+        if (role === 'employer') return ROUTES.EMPLOYER_DASHBOARD;
         return '/';
     };
 
@@ -81,6 +77,9 @@ export default function Navbar() {
             transition: 'all 0.2s'
         }
     };
+
+    // If user is authenticated, the Dashboard link inside JSX handles the view
+    // if (isAuthenticated) return null; // Removed to restore navbar visibility on homepage
 
     return (
         <nav className={`sticky-header ${scrolled ? 'scrolled' : ''}`} aria-label="Main Navigation">

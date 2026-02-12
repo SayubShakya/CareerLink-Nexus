@@ -58,3 +58,15 @@ exports.logout = catchAsync(async (req, res, next) => {
         });
     });
 });
+
+// 5. Get current authenticated user
+exports.getMe = catchAsync(async (req, res, next) => {
+    // req.user and req.role are already populated by protect middleware
+    res.status(200).json({
+        status: 'success',
+        data: {
+            user: req.user,
+            role: req.role
+        }
+    });
+});

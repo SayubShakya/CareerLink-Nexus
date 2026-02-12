@@ -12,8 +12,10 @@ import EmployerSignup from '../pages/signup/EmployerSignup';
 import JobSeekerDashboard from '../pages/dashboard/JobSeekerDashboard';
 import EmployerDashboard from '../pages/dashboard/EmployerDashboard';
 import CVBuilder from '../pages/cv-builder/CVBuilder';
+import MyProfile from '../pages/jobseeker/MyProfile';
 import EmployerLayout from '../components/layout/employer/EmployerLayout';
 import JobseekerLayout from '../components/layout/jobseeker/JobseekerLayout';
+import LogoutConfirmation from '../pages/auth/LogoutConfirmation';
 
 export const router = createBrowserRouter([
     {
@@ -56,6 +58,10 @@ export const router = createBrowserRouter([
                 path: ROUTES.PROFILE_SETUP,
                 element: <ProfileSetup />,
             },
+            {
+                path: ROUTES.LOGOUT_CONFIRMATION,
+                element: <LogoutConfirmation />,
+            },
             // Common routes removed from here if they belong to role-specific layouts
         ],
     },
@@ -70,6 +76,10 @@ export const router = createBrowserRouter([
             {
                 path: ROUTES.CV_BUILDER,
                 element: <CVBuilder />,
+            },
+            {
+                path: ROUTES.JOBSEEKER_PROFILE,
+                element: <MyProfile />,
             },
             {
                 path: ROUTES.APPLICATION_STATUS,

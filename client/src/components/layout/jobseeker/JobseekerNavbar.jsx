@@ -3,18 +3,26 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from '@assets/images/temporary_logo.png';
 import authService from '@/services/authService';
 import { ROUTES } from '@/routes/routes';
-import { Search, FilePlus, ClipboardList, LogOut } from 'lucide-react';
+import { Search, FilePlus, ClipboardList, LogOut, User } from 'lucide-react';
 
 const JobseekerNavbar = () => {
     const navigate = useNavigate();
-    const user = authService.getCurrentUser();
+    const [user, setUser] = React.useState(authService.getCurrentUser());
 
-    const handleLogout = async () => {
-        const confirmLogout = window.confirm("Are you sure you want to logout?");
-        if (confirmLogout) {
-            await authService.logout();
-            navigate(ROUTES.LOGIN);
-        }
+    React.useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const userData = await authService.fetchCurrentUser(); // Need to implement this
+                setUser(userData);
+            } catch (err) {
+                console.error("Failed to fetch user data", err);
+            }
+        };
+        fetchUserData();
+    }, []);
+
+    const handleLogout = () => {
+        navigate(ROUTES.LOGOUT_CONFIRMATION);
     };
 
     const styles = {
@@ -98,6 +106,10 @@ const JobseekerNavbar = () => {
                 <Link to={ROUTES.CV_BUILDER} style={styles.link} className="nav-item">
                     <FilePlus size={18} />
                     Create CV
+                </Link>
+                <Link to={ROUTES.JOBSEEKER_PROFILE} style={styles.link} className="nav-item">
+                    <User size={18} />
+                    My Profile
                 </Link>
                 <div style={{ width: '1px', height: '20px', backgroundColor: '#E2E8F0', margin: '0 8px' }}></div>
                 <button onClick={handleLogout} style={styles.logoutBtn} className="logout-btn">

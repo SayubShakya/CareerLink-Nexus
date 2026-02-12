@@ -13,7 +13,19 @@ import {
 } from 'lucide-react';
 
 const EmployerDashboard = () => {
-    const user = authService.getCurrentUser();
+    const [user, setUser] = React.useState(authService.getCurrentUser());
+
+    React.useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const userData = await authService.fetchCurrentUser();
+                setUser(userData);
+            } catch (err) {
+                console.error("Failed to fetch employer dashboard data", err);
+            }
+        };
+        fetchUserData();
+    }, []);
 
     // Static stats for the top section
     const stats = [

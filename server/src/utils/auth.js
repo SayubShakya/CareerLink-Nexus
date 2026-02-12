@@ -9,14 +9,15 @@ const signToken = (id) => {
 const createSendToken = (user, statusCode, res, role) => {
     const token = signToken(user.id);
 
-    // Remove password from output
-    user.password_hash = undefined;
+    // Convert to plain object and remove sensitive data
+    const userData = user.toJSON();
+    delete userData.password_hash;
 
     res.status(statusCode).json({
         status: 'success',
         token,
         data: {
-            user,
+            user: userData,
             role
         }
     });

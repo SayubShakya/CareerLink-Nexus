@@ -25,7 +25,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
     if (!currentUser) {
         currentUser = await Employer.findByPk(decoded.id);
-        role = 'employeer';
+        role = 'employer';
     }
 
     if (!currentUser) {

@@ -26,9 +26,25 @@ import {
 } from 'lucide-react';
 
 const JobSeekerDashboard = () => {
-    const user = authService.getCurrentUser();
+    const [user, setUser] = useState(authService.getCurrentUser());
     const location = useLocation();
     const [activeView, setActiveView] = useState('overview');
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                // Fetch latest data from server
+                const userData = await authService.fetchCurrentUser();
+                setUser(userData);
+            } catch (err) {
+                console.error("Failed to fetch user data for dashboard", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUserData();
+    }, []);
 
     // Update view based on URL hash or just keep it in state
     useEffect(() => {

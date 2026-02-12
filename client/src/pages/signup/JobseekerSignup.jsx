@@ -200,7 +200,7 @@ const JobseekerSignup = () => {
 
         try {
             await authService.registerJobSeeker(formData);
-            toast.success('Registration successful! Please log in.');
+            // Redirection passes the message to the Login page via state, which handles the toast.
             navigate(ROUTES.LOGIN, { state: { message: 'Registration successful! Please log in.' } });
         } catch (err) {
             const message = err.response?.data?.message || 'Registration failed. Please try again.';
@@ -301,7 +301,7 @@ const JobseekerSignup = () => {
                                     <input
                                         type={showPassword ? 'text' : 'password'}
                                         name="password"
-                                        placeholder="Enter your password"
+                                        placeholder="Enter Password"
                                         style={{
                                             ...styles.input,
                                             borderColor: errors.password ? '#E53E3E' : 'var(--border-subtle)',
@@ -340,7 +340,7 @@ const JobseekerSignup = () => {
                                     <input
                                         type={showConfirmPassword ? 'text' : 'password'}
                                         name="confirmPassword"
-                                        placeholder="Enter confirm password"
+                                        placeholder="Confirm Password"
                                         style={{
                                             ...styles.input,
                                             borderColor: errors.confirmPassword ? '#E53E3E' : 'var(--border-subtle)',

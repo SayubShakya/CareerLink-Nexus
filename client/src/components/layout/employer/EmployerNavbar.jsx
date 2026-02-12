@@ -6,14 +6,22 @@ import { ROUTES } from '@/routes/routes';
 
 const EmployerNavbar = () => {
     const navigate = useNavigate();
-    const user = authService.getCurrentUser();
+    const [user, setUser] = React.useState(authService.getCurrentUser());
 
-    const handleLogout = async () => {
-        const confirmLogout = window.confirm("Are you sure you want to logout?");
-        if (confirmLogout) {
-            await authService.logout();
-            navigate(ROUTES.LOGIN);
-        }
+    React.useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const userData = await authService.fetchCurrentUser();
+                setUser(userData);
+            } catch (err) {
+                console.error("Failed to fetch employer data", err);
+            }
+        };
+        fetchUserData();
+    }, []);
+
+    const handleLogout = () => {
+        navigate(ROUTES.LOGOUT_CONFIRMATION);
     };
 
     const styles = {

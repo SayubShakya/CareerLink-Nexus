@@ -74,6 +74,18 @@ class AuthService {
         }
     }
 
+    async fetchCurrentUser() {
+        try {
+            const response = await api.get('/auth/me');
+            const user = response.data.data.user;
+            localStorage.setItem('user', JSON.stringify(user));
+            return user;
+        } catch (err) {
+            console.error('Error fetching current user:', err);
+            throw err;
+        }
+    }
+
     /**
      * Get current user from storage
      */
@@ -87,6 +99,13 @@ class AuthService {
      */
     isAuthenticated() {
         return !!localStorage.getItem('token');
+    }
+
+    /**
+     * Manually update the user in local storage
+     */
+    updateLocalStorageUser(user) {
+        localStorage.setItem('user', JSON.stringify(user));
     }
 
     /**

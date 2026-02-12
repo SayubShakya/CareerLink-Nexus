@@ -20,9 +20,12 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
+    const toastShown = React.useRef(false);
+
     useEffect(() => {
-        if (location.state?.message) {
+        if (location.state?.message && !toastShown.current) {
             toast.success(location.state.message);
+            toastShown.current = true;
             // Clear location state so message doesn't persist on reload
             window.history.replaceState({}, document.title);
         }

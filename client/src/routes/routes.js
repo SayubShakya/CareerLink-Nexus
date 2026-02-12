@@ -11,7 +11,9 @@ export const ROUTES = {
     PROFILE_SETUP: '/profile-setup',
     JOBSEEKER_DASHBOARD: '/dashboard/jobseeker',
     CV_BUILDER: '/dashboard/jobseeker/cv-builder',
+    JOBSEEKER_PROFILE: '/dashboard/jobseeker/profile',
     APPLICATION_STATUS: '/dashboard/jobseeker/status',
     EMPLOYER_DASHBOARD: '/dashboard/employer',
+    LOGOUT_CONFIRMATION: '/logout-confirmation',
     NOT_FOUND: '*',
 };
