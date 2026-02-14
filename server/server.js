@@ -3,10 +3,16 @@ const app = require('./src/app');
 require('dotenv').config();
 require('./src/config/db'); // Initialize DB pool
 
-const PORT = process.env.PORT || 5000;
+const syncDatabase = require('./src/sync'); // Database Sync
 
-const server = app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+const PORT = process.env.PORT || 5000;
+let server;
+
+// Sync DB then start server
+syncDatabase().then(() => {
+    server = app.listen(PORT, () => {
+        console.log(`🚀 Server running on port ${PORT}`);
+    });
 });
 
 // Handle unhandled promise rejections

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '@/services/authService';
 import { ROUTES } from '@/routes/routes';
-import { LogOut, ArrowLeft } from 'lucide-react';
+import { LogOut, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 const LogoutConfirmation = () => {
@@ -13,7 +13,6 @@ const LogoutConfirmation = () => {
         setLoading(true);
         try {
             await authService.logout();
-            // Using replace: true prevents back navigation after logout
             navigate(ROUTES.LOGIN, { state: { message: 'Logged out successfully.' }, replace: true });
         } catch (error) {
             console.error("Logout failed", error);
@@ -23,132 +22,153 @@ const LogoutConfirmation = () => {
     };
 
     const handleCancel = () => {
-        // Go back to the previous page
         navigate(-1);
     };
 
-    const styles = {
-        container: {
-            height: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'var(--bg-subtle)', // Assuming this variable exists
-            padding: '20px'
-        },
-        card: {
-            backgroundColor: 'white',
-            borderRadius: '16px',
-            padding: '40px',
-            boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
-            textAlign: 'center',
-            maxWidth: '500px',
-            width: '100%',
-            animation: 'fadeIn 0.3s ease-out'
-        },
-        iconContainer: {
-            width: '80px',
-            height: '80px',
-            backgroundColor: '#FFF5F5',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 24px',
-            color: '#C53030'
-        },
-        title: {
-            fontSize: '1.5rem',
-            fontWeight: '700',
-            color: 'var(--color-brand-primary)', // Assuming variable exists
-            marginBottom: '12px'
-        },
-        message: {
-            color: 'var(--text-muted)', // Assuming variable exists
-            lineHeight: '1.6',
-            marginBottom: '32px'
-        },
-        buttonGroup: {
-            display: 'flex',
-            gap: '16px',
-            justifyContent: 'center'
-        },
-        cancelBtn: {
-            padding: '12px 24px',
-            backgroundColor: 'transparent',
-            border: '1px solid var(--border-subtle)', // Assuming variable exists
-            color: 'var(--text-main)', // Assuming variable exists
-            borderRadius: '8px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            transition: 'background-color 0.2s'
-        },
-        logoutBtn: {
-            padding: '12px 24px',
-            backgroundColor: '#E53E3E',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            transition: 'background-color 0.2s'
-        }
-    };
-
     return (
-        <div style={styles.container}>
-            <div style={styles.card}>
-                <div style={styles.iconContainer}>
-                    <LogOut size={40} />
+        <div className="logout-overlay">
+            <style>{`
+                .logout-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(248, 250, 252, 0.95);
+                    backdrop-filter: blur(8px);
+                    z-index: 9999; /* HIGHEST Z-INDEX TO COVER NAVBAR */
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-family: 'Inter', sans-serif;
+                }
+
+                .logout-card {
+                    background: white;
+                    border-radius: 32px;
+                    padding: 48px;
+                    width: 100%;
+                    max-width: 480px;
+                    text-align: center;
+                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+                    border: 1px solid rgba(226, 232, 240, 0.8);
+                    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+
+                .icon-wrapper {
+                    width: 80px;
+                    height: 80px;
+                    background: #FEF2F2;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto 24px;
+                    color: #EF4444;
+                    box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.1);
+                }
+
+                .logout-title {
+                    font-size: 1.75rem;
+                    font-weight: 800;
+                    color: #1E293B;
+                    margin-bottom: 12px;
+                    letter-spacing: -0.02em;
+                }
+
+                .logout-message {
+                    color: #64748B;
+                    font-size: 1rem;
+                    line-height: 1.6;
+                    margin-bottom: 40px;
+                }
+
+                .btn-group {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                }
+
+                .btn-logout {
+                    width: 100%;
+                    padding: 16px;
+                    background: #EF4444;
+                    color: white;
+                    border: none;
+                    border-radius: 16px;
+                    font-weight: 700;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    transition: all 0.2s;
+                    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+                }
+                .btn-logout:hover {
+                    background: #DC2626;
+                    transform: translateY(-2px);
+                    box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
+                }
+
+                .btn-cancel {
+                    width: 100%;
+                    padding: 16px;
+                    background: white;
+                    color: #64748B;
+                    border: 2px solid #E2E8F0;
+                    border-radius: 16px;
+                    font-weight: 700;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    transition: all 0.2s;
+                }
+                .btn-cancel:hover {
+                    background: #F8FAFC;
+                    color: #1E293B;
+                    border-color: #CBD5E1;
+                }
+
+                @keyframes slideUp {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            `}</style>
+
+            <div className="logout-card">
+                <div className="icon-wrapper">
+                    <LogOut size={36} strokeWidth={2.5} />
                 </div>
-                <h2 style={styles.title}>Data Security Check</h2>
-                <p style={styles.message}>
-                    Are you sure you want to log out? <br />
-                    Any unsaved changes may be lost. You will need to sign in again to access your account.
+
+                <h2 className="logout-title">Signing Out?</h2>
+                <p className="logout-message">
+                    You are about to end your secure session.<br />
+                    Come back soon!
                 </p>
-                <div style={styles.buttonGroup}>
+
+                <div className="btn-group">
                     <button
-                        onClick={handleCancel}
-                        style={styles.cancelBtn}
-                        className="btn-secondary"
-                        disabled={loading}
-                    >
-                        <ArrowLeft size={18} />
-                        Stay Logged In
-                    </button>
-                    <button
+                        className="btn-logout"
                         onClick={handleConfirmLogout}
-                        style={styles.logoutBtn}
-                        className="btn-danger"
                         disabled={loading}
                     >
-                        {loading ? 'Logging Out...' : 'Yes, Log Out'}
+                        {loading ? 'Signing Out...' : 'Yes, Sign Out'}
+                    </button>
+
+                    <button
+                        className="btn-cancel"
+                        onClick={handleCancel}
+                        disabled={loading}
+                    >
+                        Stay Logged In
                     </button>
                 </div>
             </div>
-            <style>{`
-                @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(10px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                .btn-secondary:hover {
-                    background-color: #F7FAFC !important;
-                }
-                .btn-danger:hover {
-                    background-color: #C53030 !important;
-                    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.2);
-                }
-            `}</style>
         </div>
     );
 };

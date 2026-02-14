@@ -7,7 +7,7 @@
     justify-content: center;
     text-align: center;
     background: radial-gradient(circle at top right, rgba(62, 97, 255, 0.05), transparent),
-                radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.05), transparent);
+        radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.05), transparent);
     overflow: hidden;
     min-height: 60vh;
 }
@@ -132,7 +132,8 @@
     flex-wrap: wrap;
 }
 
-.btn-primary, .btn-secondary {
+.btn-primary,
+.btn-secondary {
     padding: 14px 28px;
     border-radius: var(--radius-full);
     font-weight: 600;
@@ -166,6 +167,37 @@
 .btn-secondary:hover {
     opacity: 0.9;
     transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
 }
 
 /* Responsive adjustments */

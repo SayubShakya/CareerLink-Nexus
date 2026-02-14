@@ -9,7 +9,7 @@ const EmployerLayout = () => {
     const userRole = localStorage.getItem('role');
 
     // Safety check: if user is not an employer, redirect to login
-    if (!authService.isAuthenticated() || userRole !== 'employeer') {
+    if (!authService.isAuthenticated() || userRole !== 'employer') {
         return <Navigate to={ROUTES.LOGIN} replace />;
     }
 

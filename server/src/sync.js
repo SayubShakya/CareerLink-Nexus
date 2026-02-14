@@ -3,6 +3,7 @@ const Role = require('./models/Role');
 const JobSeeker = require('./models/JobSeeker');
 const Employer = require('./models/Employer');
 const CV = require('./models/CV');
+const Application = require('./models/Application');
 
 const syncDatabase = async () => {
     try {
@@ -14,6 +15,7 @@ const syncDatabase = async () => {
         await JobSeeker.sync({ alter: true });
         await Employer.sync({ alter: true });
         await CV.sync({ alter: true });
+        await Application.sync({ alter: true });
 
         console.log('✅ All tables synced successfully.');
 

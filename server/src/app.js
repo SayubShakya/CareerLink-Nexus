@@ -13,6 +13,7 @@ const app = express();
 const jobSeekerRoutes = require('./routes/jobSeekerRoutes');
 const employerRoutes = require('./routes/employerRoutes');
 const cvRoutes = require('./routes/cvRoutes');
+const jobRoutes = require('./routes/jobRoutes');
 
 // Global Middleware
 app.use(cors({
@@ -43,6 +44,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/job-seekers', jobSeekerRoutes);
 app.use('/api/employers', employerRoutes);
 app.use('/api/cvs', cvRoutes);
+app.use('/api/jobs', jobRoutes); // New route
 
 // Handle Undefined Routes
 app.all(/(.*)/, (req, res, next) => {

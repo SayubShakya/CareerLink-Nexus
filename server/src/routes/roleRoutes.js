@@ -51,7 +51,7 @@ const router = express.Router();
  *             properties:
  *               name:
  *                 type: string
- *                 enum: [job_seeker, employeer]
+ *                 enum: [job_seeker, employer]
  *     responses:
  *       201:
  *         description: The created role
@@ -126,7 +126,7 @@ router
  *             properties:
  *               name:
  *                 type: string
- *                 enum: [job_seeker, employeer]
+ *                 enum: [job_seeker, employer]
  *     responses:
  *       200:
  *         description: The updated role

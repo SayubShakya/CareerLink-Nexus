@@ -1,27 +1,25 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useAuth from '@/hooks/useAuth';
 import {
     Search,
     Briefcase,
-    Users,
     Building2,
-    ChevronRight,
     SearchCheck,
-    Star,
-    MapPin,
-    DollarSign,
-    Zap,
+    ChevronRight,
     ChevronLeft
 } from 'lucide-react';
 
 import bannerHuman from '@/assets/images/banner-human2.png';
 
-const FindJobs = () => {
-    const navigate = useNavigate();
+const PublicFindJobs = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState('Company'); // 'Company' or 'Individual Jobs'
     const [currentPage, setCurrentPage] = useState(1);
     const jobsPerPage = 10;
+
+    const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
 
     const stats = [
         { label: 'Live Jobs', value: '350', icon: <Briefcase size={20} /> },
@@ -86,6 +84,15 @@ const FindJobs = () => {
     const indexOfFirstJob = indexOfLastJob - jobsPerPage;
     const currentJobs = filteredIndividualJobs.slice(indexOfFirstJob, indexOfLastJob);
     const totalPages = Math.ceil(filteredIndividualJobs.length / jobsPerPage);
+
+    const handleApplyClick = (e) => {
+        e.stopPropagation();
+        if (isAuthenticated()) {
+            console.log("Applying...");
+        } else {
+            navigate('/login');
+        }
+    };
 
     return (
         <div className="find-jobs-container">
@@ -163,7 +170,7 @@ const FindJobs = () => {
                     gap: 40px; 
                     align-items: center;
                     animation: scroll 30s linear infinite;
-                    padding-right: 40px;
+                    padding-right: 40px; /* gap compensation */
                 }
                 .logos-scroll:hover {
                     animation-play-state: paused;
@@ -225,22 +232,40 @@ const FindJobs = () => {
             <div className="hero-section">
                 <div className="hero-flex-container">
                     <div className="hero-left">
-                        <h1 className="hero-title">Start your Success Journey <span>Today</span></h1>
+                        <h1 className="hero-title">
+                            Find Your <span>Dream Job</span> in Nepal
+                        </h1>
                         <div className="stats-grid">
-                            {stats.map((s, i) => (
+                            {stats.map((stat, i) => (
                                 <div key={i} className="stat-item">
-                                    <div className="stat-icon">{s.icon}</div>
-                                    <div className="stat-text"><span className="lbl">{s.label}</span><span className="val">{s.value}</span></div>
+                                    <div className="stat-icon">{stat.icon}</div>
+                                    <div className="stat-text">
+                                        <span className="val">{stat.value}</span>
+                                        <span className="lbl">{stat.label}</span>
+                                    </div>
                                 </div>
                             ))}
                         </div>
                         <div className="search-bar">
-                            <input type="text" placeholder="Search By Job Title" value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }} />
-                            <button className="search-btn"><Search size={18} /> Search Job</button>
+                            <input
+                                type="text"
+                                placeholder="Job title or keyword..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <button className="search-btn">
+                                <Search size={18} /> Find Jobs
+                            </button>
                         </div>
-                        <div className="filter-pills">{filterOptions.map((f, i) => (<div key={i} className="pill">{f}</div>))}</div>
+                        <div className="filter-pills">
+                            {filterOptions.map((filter, i) => (
+                                <div key={i} className="pill">{filter}</div>
+                            ))}
+                        </div>
                     </div>
-                    <div className="hero-right"><img src={bannerHuman} alt="Banner" className="hero-image" /></div>
+                    <div className="hero-right">
+                        <img src={bannerHuman} alt="Find Jobs" className="hero-image" />
+                    </div>
                 </div>
             </div>
 
@@ -248,8 +273,9 @@ const FindJobs = () => {
                 <div className="bar-label">Top Employers</div>
                 <div className="marqee-wrapper">
                     <div className="logos-scroll">
-                        {[...topEmployers, ...topEmployers, ...topEmployers].map((e, i) => (
-                            <div key={i} className="employer-logo">{e.logo} {e.name}</div>
+                        {/* Duplicate lists for seamless infinite scroll */}
+                        {[...topEmployers, ...topEmployers, ...topEmployers].map((emp, i) => (
+                            <div key={i} className="employer-logo">{emp.logo} {emp.name}</div>
                         ))}
                     </div>
                 </div>
@@ -257,10 +283,24 @@ const FindJobs = () => {
 
             <div className="jobs-content">
                 <div className="content-header">
-                    <div className="header-title"><Star size={20} fill="#EAB308" color="#EAB308" /> Top Jobs</div>
+                    <div>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: '900', color: 'var(--text-main)', marginBottom: '4px' }}>
+                            🔥 Top Jobs
+                        </h2>
+                    </div>
                     <div className="view-toggles">
-                        <button className={`toggle-btn ${viewMode === 'Company' ? 'active' : ''}`} onClick={() => setViewMode('Company')}>Company</button>
-                        <button className={`toggle-btn ${viewMode === 'Individual Jobs' ? 'active' : ''}`} onClick={() => { setViewMode('Individual Jobs'); setCurrentPage(1); }}>Individual Jobs</button>
+                        <button
+                            className={`toggle-btn ${viewMode === 'Company' ? 'active' : ''}`}
+                            onClick={() => setViewMode('Company')}
+                        >
+                            Company
+                        </button>
+                        <button
+                            className={`toggle-btn ${viewMode === 'Individual Jobs' ? 'active' : ''}`}
+                            onClick={() => setViewMode('Individual Jobs')}
+                        >
+                            Individual Jobs
+                        </button>
                     </div>
                 </div>
 
@@ -268,24 +308,34 @@ const FindJobs = () => {
                     <div className="jobs-grid">
                         {companyData.map((item, i) => (
                             <div key={i} className="company-card">
-                                <div style={{ display: 'flex', gap: '16px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                                     <div className="company-icon">{item.logoChar}</div>
-                                    <div><h3 style={{ fontSize: '0.95rem', fontWeight: 800 }}>{item.company}</h3><span style={{ fontSize: '0.75rem', color: '#3E61FF', fontWeight: 700 }}>Top Employer</span></div>
+                                    <div>
+                                        <h3 style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--text-main)', marginBottom: '2px' }}>
+                                            {item.company}
+                                        </h3>
+                                        <span style={{ fontSize: '0.75rem', color: 'var(--color-brand-accent)', fontWeight: '700' }}>
+                                            Top Employer
+                                        </span>
+                                    </div>
                                 </div>
                                 <div className="roles-list">
-                                    {item.roles.map((role, ri) => (
+                                    {item.roles.map((role, j) => (
                                         <div
-                                            key={ri}
+                                            key={j}
                                             className="role-link"
                                             style={{ cursor: 'pointer' }}
                                             onClick={(e) => {
-                                                e.preventDefault();
+                                                e.stopPropagation();
                                                 if (role === 'Montessori Teacher') {
-                                                    navigate('/jobseeker/jobs/montessori-teacher');
+                                                    navigate('/jobs/montessori-teacher');
+                                                } else {
+                                                    // For other roles, keep existing behavior or do nothing for now
+                                                    // handleApplyClick(e); 
                                                 }
                                             }}
                                         >
-                                            <div className="role-dot" />
+                                            <div className="role-dot"></div>
                                             {role}
                                         </div>
                                     ))}
@@ -294,37 +344,62 @@ const FindJobs = () => {
                         ))}
                     </div>
                 ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        {currentJobs.map((job) => (
-                            <div key={job.id} className="job-item-card">
-                                <div className="job-main-info">
-                                    <div className="job-badge">{job.logo}</div>
-                                    <div>
-                                        <div className="job-title">{job.role}</div>
-                                        <div className="job-meta">
-                                            <div className="meta-item"><Building2 size={14} /> {job.company}</div>
-                                            <div className="meta-item"><MapPin size={14} /> {job.loc}</div>
-                                            <div className="meta-item"><DollarSign size={14} /> {job.pay}</div>
-                                            <div className="meta-item"><Zap size={14} color="#3E61FF" /> {job.type}</div>
+                    <>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            {currentJobs.map((job) => (
+                                <div key={job.id} className="job-item-card">
+                                    <div className="job-main-info">
+                                        <div className="job-badge">{job.logo}</div>
+                                        <div>
+                                            <div className="job-title">{job.role}</div>
+                                            <div className="job-meta">
+                                                <span className="meta-item">{job.company}</span>
+                                                <span>•</span>
+                                                <span className="meta-item">{job.loc}</span>
+                                                <span>•</span>
+                                                <span className="meta-item">{job.pay}</span>
+                                            </div>
                                         </div>
                                     </div>
+                                    <button className="apply-btn" onClick={handleApplyClick}>
+                                        Apply Now <ChevronRight size={18} />
+                                    </button>
                                 </div>
-                                <button className="apply-btn">Apply Now <ChevronRight size={16} /></button>
-                            </div>
-                        ))}
-
-                        <div className="pagination-tray">
-                            <button className="page-btn" disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}><ChevronLeft size={18} /></button>
-                            {[...Array(totalPages)].map((_, i) => (
-                                <button key={i + 1} className={`page-btn ${currentPage === i + 1 ? 'active' : ''}`} onClick={() => setCurrentPage(i + 1)}>{i + 1}</button>
                             ))}
-                            <button className="page-btn" disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}><ChevronRight size={18} /></button>
                         </div>
-                    </div>
+
+                        {totalPages > 1 && (
+                            <div className="pagination-tray">
+                                <button
+                                    className="page-btn"
+                                    disabled={currentPage === 1}
+                                    onClick={() => setCurrentPage(currentPage - 1)}
+                                >
+                                    <ChevronLeft size={20} />
+                                </button>
+                                {[...Array(totalPages)].map((_, i) => (
+                                    <button
+                                        key={i}
+                                        className={`page-btn ${currentPage === i + 1 ? 'active' : ''}`}
+                                        onClick={() => setCurrentPage(i + 1)}
+                                    >
+                                        {i + 1}
+                                    </button>
+                                ))}
+                                <button
+                                    className="page-btn"
+                                    disabled={currentPage === totalPages}
+                                    onClick={() => setCurrentPage(currentPage + 1)}
+                                >
+                                    <ChevronRight size={20} />
+                                </button>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>
     );
 };
 
-export default FindJobs;
+export default PublicFindJobs;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '@assets/images/temporary_logo.png';
+import Logo from '@/components/common/Logo';
 import { ROUTES } from '../../routes/routes';
 import authService from '@/services/authService';
 
@@ -29,16 +29,6 @@ export default function Navbar() {
     };
 
     const navStyles = {
-        brand: {
-            fontSize: '1.6rem',
-            fontWeight: '800',
-            color: 'var(--color-brand-primary)',
-            textDecoration: 'none',
-            letterSpacing: '-0.03em'
-        },
-        accent: {
-            color: 'var(--color-brand-accent)'
-        },
         navLinks: {
             display: 'flex',
             gap: 'var(--space-md)',
@@ -46,12 +36,14 @@ export default function Navbar() {
         },
         link: {
             fontSize: '0.95rem',
-            fontWeight: '500',
+            fontWeight: '600',
             color: 'var(--text-main)',
             textDecoration: 'none',
-            opacity: 0.8,
+            opacity: 0.9,
             transition: 'all 0.3s ease',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            padding: '8px 12px',
+            borderRadius: '8px'
         },
         btn: {
             padding: '0.65rem 1.4rem',
@@ -78,14 +70,11 @@ export default function Navbar() {
         }
     };
 
-    // If user is authenticated, the Dashboard link inside JSX handles the view
-    // if (isAuthenticated) return null; // Removed to restore navbar visibility on homepage
-
     return (
         <nav className={`sticky-header ${scrolled ? 'scrolled' : ''}`} aria-label="Main Navigation">
             <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
-                    <img src={logo} alt="CareerLink" style={{ height: '140px', objectFit: 'contain' }} />
+                <Link to="/" style={{ textDecoration: 'none' }}>
+                    <Logo variant="full" />
                 </Link>
 
                 <nav style={navStyles.navLinks} aria-label="Quick Links">
@@ -116,6 +105,7 @@ export default function Navbar() {
         .nav-item:hover {
           opacity: 1 !important;
           color: var(--color-brand-accent) !important;
+          background: rgba(62, 97, 255, 0.05);
         }
         @media (max-width: 768px) {
           nav { display: none !important; }

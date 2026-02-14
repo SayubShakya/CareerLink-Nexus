@@ -30,7 +30,7 @@ const options = {
                         },
                         name: {
                             type: 'string',
-                            enum: ['job_seeker', 'employeer'],
+                            enum: ['job_seeker', 'employer'],
                             description: 'Name of the role',
                         },
                         created_at: {

@@ -22,4 +22,7 @@ export const API_ENDPOINTS = {
         GET: '/job-seekers/me',
         UPDATE: '/job-seekers/me',
     },
+    EMPLOYER: {
+        APPLICATIONS: '/employers/applications',
+    },
 };

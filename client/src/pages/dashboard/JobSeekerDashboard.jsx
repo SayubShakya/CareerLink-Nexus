@@ -38,7 +38,7 @@ const JobSeekerDashboard = () => {
     const stats = [
         { label: 'Jobs Applied', value: '24', trend: 'Total count' },
         { label: 'My Resumes', value: '3', trend: 'In your files' },
-        { label: 'Under Review', value: '12', trend: 'Active jobs', highlight: true },
+        { label: 'Under Review', value: '12', trend: 'Active jobs' },
         { label: 'Interview Calls', value: '5', trend: 'Shortlisted', color: '#0F172A' },
     ];
 

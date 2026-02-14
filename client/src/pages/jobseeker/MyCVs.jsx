@@ -392,16 +392,16 @@ const MyCVs = () => {
             <div className="vault-hero-container">
                 <div className="vault-hero">
                     <div className="hero-content">
-                        <div className="hero-badge"><FileSearch size={14} /> My Private Vault</div>
-                        <h1 className="hero-title">Nexus <span>Storage</span> Hub</h1>
+
+                        <h1 className="hero-title">My <span>CV</span> Storage</h1>
 
                         <div className="stats-tray">
                             <div className="stat-card">
-                                <span className="lbl">Nexus Designs</span>
+                                <span className="lbl">Created CVs</span>
                                 <span className="val">{cvs.filter(c => c.type === 'platform').length}</span>
                             </div>
                             <div className="stat-card">
-                                <span className="lbl">External Uploads</span>
+                                <span className="lbl">Uploaded CVs</span>
                                 <span className="val">{cvs.filter(c => c.type === 'uploaded').length}</span>
                             </div>
                         </div>
@@ -438,8 +438,8 @@ const MyCVs = () => {
             <div className="vault-main">
                 <div className="filter-tabs">
                     <div className={`tab-item ${activeFilter === 'All' ? 'active' : ''}`} onClick={() => setActiveFilter('All')}>All Files</div>
-                    <div className={`tab-item ${activeFilter === 'platform' ? 'active' : ''}`} onClick={() => setActiveFilter('platform')}>Nexus</div>
-                    <div className={`tab-item ${activeFilter === 'uploaded' ? 'active' : ''}`} onClick={() => setActiveFilter('uploaded')}>Vault</div>
+                    <div className={`tab-item ${activeFilter === 'platform' ? 'active' : ''}`} onClick={() => setActiveFilter('platform')}>Created</div>
+                    <div className={`tab-item ${activeFilter === 'uploaded' ? 'active' : ''}`} onClick={() => setActiveFilter('uploaded')}>Uploaded</div>
                 </div>
 
                 <div className="asset-grid">

@@ -1,145 +1,261 @@
-import logo from '@assets/images/temporary_logo.png';
+import Logo from '@/components/common/Logo';
+import { Linkedin, Twitter, MessageCircle, ArrowRight } from 'lucide-react'; // Using lucide icons if available, otherwise fallback to SVG
 
 export default function Footer() {
-    const footerStyle = {
-        backgroundColor: 'var(--bg-dark)',
-        color: 'var(--text-inverse)',
-        padding: 'var(--space-xl) 0 40px',
-        marginTop: 'auto',
-        position: 'relative',
-        overflow: 'hidden'
-    };
-
-    const columnHeadingStyle = {
-        fontSize: '0.85rem',
-        fontWeight: '700',
-        marginBottom: '25px',
-        color: 'white',
-        textTransform: 'uppercase',
-        letterSpacing: '0.1em'
-    };
-
-    const linkStyle = {
-        color: 'var(--text-light)',
-        fontSize: '0.95rem',
-        marginBottom: '14px',
-        display: 'block',
-        transition: 'all 0.3s ease',
-        textDecoration: 'none'
-    };
-
-    const newsletterContainer = {
-        background: 'rgba(255, 255, 255, 0.03)',
-        borderRadius: 'var(--radius-lg)',
-        padding: '40px',
-        marginBottom: 'var(--space-xl)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '30px',
-        border: '1px solid rgba(255, 255, 255, 0.05)'
-    };
-
     return (
-        <footer style={footerStyle}>
-            {/* Subtle background glow */}
-            <div style={{ position: 'absolute', top: '-100px', left: '-100px', width: '300px', height: '300px', background: 'var(--color-brand-accent)', opacity: 0.05, filter: 'blur(100px)', borderRadius: '50%' }}></div>
+        <footer className="footer-root">
+            {/* Top Gradient Border */}
+            <div className="footer-gradient-border"></div>
 
-            <div className="container">
+            <div className="container" style={{ position: 'relative', zIndex: 10 }}>
                 {/* Newsletter Section */}
-                <div style={newsletterContainer}>
-                    <div style={{ maxWidth: '450px' }}>
-                        <h3 style={{ fontSize: '1.75rem', fontWeight: '700', marginBottom: '10px', color: 'white' }}>Subscribe to the Elite Newsletter</h3>
-                        <p style={{ color: 'var(--text-light)', fontSize: '1rem' }}>Get the latest curated roles and career insights delivered to your inbox.</p>
+                <div className="newsletter-card">
+                    <div className="newsletter-content">
+                        <h3>Join the Elite Network</h3>
+                        <p>Get exclusive access to top-tier roles, industry intelligence, and career strategies delivered to your inbox.</p>
                     </div>
-                    <div style={{ display: 'flex', gap: '10px', flex: 1, maxWidth: '400px' }}>
-                        <input
-                            type="email"
-                            placeholder="Your email address"
-                            className="footer-newsletter-input"
-                            style={{ flex: 1, padding: '12px 20px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', outline: 'none', transition: 'all 0.3s ease' }}
-                        />
-                        <button className="btn-premium btn-premium-primary" style={{ minWidth: 'auto', padding: '12px 25px' }}>Subscribe</button>
+                    <div className="newsletter-form">
+                        <input type="email" placeholder="Enter your work email" />
+                        <button>
+                            Subscribe <ArrowRight size={18} />
+                        </button>
                     </div>
+                    {/* Decorative glow */}
+                    <div className="newsletter-glow"></div>
                 </div>
 
                 {/* Main Footer Links */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '50px', marginBottom: '80px' }}>
-                    <div style={{ gridColumn: 'span 2' }}>
-                        <div style={{ marginBottom: '20px' }}>
-                            <img src={logo} alt="CareerLink" style={{ height: '120px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
-                        </div>
-                        <p style={{ color: 'var(--text-light)', fontSize: '1rem', lineHeight: '1.8', maxWidth: '300px' }}>
+                <div className="footer-grid">
+                    <div className="brand-col">
+                        <Logo variant="full" theme="dark" />
+                        <div style={{ height: '24px' }}></div>
+                        <p className="brand-desc">
                             The premier ecosystem where the world's most innovative companies meet world-class talent.
                         </p>
                     </div>
 
-                    <div>
-                        <h4 style={columnHeadingStyle}>Platform</h4>
-                        <a href="/jobs" style={linkStyle} className="footer-link-v2">Explore Collection</a>
-                        <a href="/companies" style={linkStyle} className="footer-link-v2">Elite Companies</a>
-                        <a href="/candidates" style={linkStyle} className="footer-link-v2">Talent Network</a>
-                        <a href="/pricing" style={linkStyle} className="footer-link-v2">Membership</a>
+                    <div className="link-col">
+                        <h4>Platform</h4>
+                        <a href="/jobs">Explore Roles</a>
+                        <a href="/companies">Elite Companies</a>
+                        <a href="/candidates">Talent Network</a>
+                        <a href="/pricing">Membership</a>
                     </div>
 
-                    <div>
-                        <h4 style={columnHeadingStyle}>Intelligence</h4>
-                        <a href="/about" style={linkStyle} className="footer-link-v2">Industry Reports</a>
-                        <a href="/careers" style={linkStyle} className="footer-link-v2">Career Strategy</a>
-                        <a href="/blog" style={linkStyle} className="footer-link-v2">The Journal</a>
-                        <a href="/contact" style={linkStyle} className="footer-link-v2">Concierge</a>
+                    <div className="link-col">
+                        <h4>Intelligence</h4>
+                        <a href="/about">Industry Reports</a>
+                        <a href="/careers">Career Strategy</a>
+                        <a href="/blog">The Journal</a>
+                        <a href="/contact">Concierge</a>
                     </div>
 
-                    <div>
-                        <h4 style={columnHeadingStyle}>Legal</h4>
-                        <a href="/privacy" style={linkStyle} className="footer-link-v2">Privacy Policy</a>
-                        <a href="/terms" style={linkStyle} className="footer-link-v2">Terms of Service</a>
-                        <a href="/cookies" style={linkStyle} className="footer-link-v2">Information Safety</a>
+                    <div className="link-col">
+                        <h4>Legal</h4>
+                        <a href="/privacy">Privacy Policy</a>
+                        <a href="/terms">Terms of Service</a>
+                        <a href="/cookies">Information Safety</a>
                     </div>
                 </div>
 
                 {/* Bottom Bar */}
-                <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
-                    <p style={{ color: 'var(--text-light)', fontSize: '0.85rem' }}>
-                        &copy; {new Date().getFullYear()} CareerLink Hub. All rights reserved. Built for the future of work.
-                    </p>
-
-                    <div style={{ display: 'flex', gap: '25px' }}>
-                        <a href="#" style={{ color: 'var(--text-light)' }} className="social-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
-                        </a>
-                        <a href="#" style={{ color: 'var(--text-light)' }} className="social-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.238 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg>
-                        </a>
-                        <a href="#" style={{ color: 'var(--text-light)' }} className="social-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg>
-                        </a>
+                <div className="footer-bottom">
+                    <p>&copy; {new Date().getFullYear()} CareerLink Hub. All rights reserved.</p>
+                    <div className="social-links">
+                        <a href="#" aria-label="Twitter"><Twitter size={20} /></a>
+                        <a href="#" aria-label="LinkedIn"><Linkedin size={20} /></a>
+                        <a href="#" aria-label="Contact"><MessageCircle size={20} /></a>
                     </div>
                 </div>
             </div>
 
             <style>{`
-        .footer-link-v2:hover {
-          color: white !important;
-          transform: translateX(6px);
-        }
-        .social-icon {
-          transition: all 0.3s ease;
-          opacity: 0.6;
-        }
-        .social-icon:hover {
-          opacity: 1;
-          color: var(--color-brand-accent) !important;
-          transform: translateY(-3px);
-        }
-        @media (max-width: 768px) {
-          .newsletter-container {
-             flex-direction: column;
-             text-align: center;
-          }
-        }
-      `}</style>
+                .footer-root {
+                    background-color: #020617; /* Very dark slate/black */
+                    color: #94A3B8;
+                    padding: 80px 0 30px;
+                    margin-top: auto;
+                    position: relative;
+                    overflow: hidden;
+                    font-family: 'Inter', sans-serif;
+                }
+
+                .footer-gradient-border {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 4px;
+                    background: linear-gradient(90deg, #3E61FF, #8B5CF6, #EC4899);
+                }
+
+                .newsletter-card {
+                    background: linear-gradient(145deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.6));
+                    border: 1px solid rgba(255, 255, 255, 0.05);
+                    border-radius: 24px;
+                    padding: 48px;
+                    margin-bottom: 80px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 40px;
+                    position: relative;
+                    overflow: hidden;
+                    backdrop-filter: blur(10px);
+                }
+                
+                .newsletter-glow {
+                    position: absolute;
+                    top: -50%;
+                    right: -10%;
+                    width: 400px;
+                    height: 400px;
+                    background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+                    border-radius: 50%;
+                    z-index: 0;
+                    pointer-events: none;
+                }
+
+                .newsletter-content {
+                    flex: 1;
+                    max-width: 500px;
+                    position: relative;
+                    z-index: 1;
+                }
+                .newsletter-content h3 {
+                    color: white;
+                    font-size: 2rem;
+                    font-weight: 800;
+                    margin-bottom: 12px;
+                    letter-spacing: -0.02em;
+                }
+                .newsletter-content p {
+                    font-size: 1.05rem;
+                    line-height: 1.6;
+                    color: #CBD5E1;
+                }
+
+                .newsletter-form {
+                    flex: 1;
+                    /* max-width: 450px; removed max-width constrain to fill space */ 
+                    display: flex;
+                    gap: 12px;
+                    position: relative;
+                    z-index: 1;
+                }
+                .newsletter-form input {
+                    flex: 1;
+                    background: rgba(15, 23, 42, 0.8);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 12px;
+                    padding: 16px 24px;
+                    color: white;
+                    font-size: 1rem;
+                    transition: all 0.2s;
+                    outline: none;
+                }
+                .newsletter-form input:focus {
+                    border-color: #3E61FF;
+                    background: rgba(15, 23, 42, 1);
+                    box-shadow: 0 0 0 4px rgba(62, 97, 255, 0.15);
+                }
+                .newsletter-form button {
+                    background: #3E61FF;
+                    color: white;
+                    border: none;
+                    border-radius: 12px;
+                    padding: 0 28px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: all 0.2s;
+                    white-space: nowrap;
+                }
+                .newsletter-form button:hover {
+                    background: #2563EB;
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+                }
+
+                /* Footer Grid */
+                .footer-grid {
+                    display: grid;
+                    grid-template-columns: 2fr 1fr 1fr 1fr;
+                    gap: 60px;
+                    margin-bottom: 60px;
+                }
+                
+                .brand-col { padding-right: 40px; }
+                .footer-logo {
+                    height: 40px;
+                    margin-bottom: 24px;
+                    filter: brightness(0) invert(1);
+                    opacity: 0.9;
+                }
+                .brand-desc {
+                    line-height: 1.7;
+                    font-size: 1rem;
+                    color: #94A3B8;
+                }
+
+                .link-col h4 {
+                    color: white;
+                    font-weight: 700;
+                    font-size: 0.9rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    margin-bottom: 24px;
+                }
+                .link-col a {
+                    display: block;
+                    color: #94A3B8;
+                    text-decoration: none;
+                    margin-bottom: 14px;
+                    font-size: 0.95rem;
+                    transition: 0.2s;
+                }
+                .link-col a:hover {
+                    color: #3E61FF;
+                    transform: translateX(4px);
+                }
+
+                /* Bottom Bar */
+                .footer-bottom {
+                    border-top: 1px solid rgba(255, 255, 255, 0.05);
+                    padding-top: 32px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                .footer-bottom p { font-size: 0.9rem; color: #64748B; }
+
+                .social-links { display: flex; gap: 24px; }
+                .social-links a {
+                    color: #64748B;
+                    transition: 0.2s;
+                }
+                .social-links a:hover {
+                    color: white;
+                    transform: translateY(-3px);
+                }
+
+                @media (max-width: 1024px) {
+                    .newsletter-card { flex-direction: column; text-align: center; }
+                    .newsletter-form { width: 100%; }
+                    .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+                    .brand-col { grid-column: span 2; padding-right: 0; text-align: center; }
+                    .footer-logo { margin: 0 auto 24px; }
+                }
+                @media (max-width: 640px) {
+                    .footer-grid { grid-template-columns: 1fr; text-align: center; }
+                    .brand-col { grid-column: span 1; }
+                    .footer-bottom { flex-direction: column; gap: 20px; text-align: center; }
+                    .newsletter-form { flex-direction: column; }
+                    .newsletter-form button { width: 100%; padding: 16px; justify-content: center; }
+                }
+            `}</style>
         </footer>
     );
 }

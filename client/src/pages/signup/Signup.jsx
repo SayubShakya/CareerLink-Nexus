@@ -115,11 +115,7 @@ const Signup = () => {
             <div style={styles.card}>
                 {/* Left Column - Illustration */}
                 <div style={styles.leftColumn} className="auth-left-hide">
-                    <div style={{ alignSelf: 'flex-start', marginBottom: '40px' }}>
-                        <Link to="/">
-                            <img src={logo} alt="CareerLink" style={{ height: '40px', objectFit: 'contain' }} />
-                        </Link>
-                    </div>
+
                     <img src={authIllustration} alt="Authentication" style={styles.illustration} />
                     <h3 style={{ fontSize: '1.4rem', color: 'var(--color-brand-primary)', marginBottom: '10px' }}>
                         Join CareerLink

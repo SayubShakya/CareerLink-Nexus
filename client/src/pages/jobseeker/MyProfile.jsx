@@ -35,7 +35,9 @@ const MyProfile = () => {
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [emailNotifications, setEmailNotifications] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
+    const [language, setLanguage] = useState('en');
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -94,83 +96,152 @@ const MyProfile = () => {
                     transition: background-color 0.3s;
                 }
 
-                /* PREMIUM HERO */
+                /* COMPACT HERO */
                 .profile-hero {
-                    background: var(--bg-main);
-                    padding: 80px;
+                    background: linear-gradient(135deg, #3E61FF 0%, #6366F1 60%, #8B5CF6 100%);
+                    padding: 30px 80px 60px;
                     border-radius: 0 0 50px 50px;
-                    margin-bottom: 60px;
+                    position: relative;
+                    overflow: hidden;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    box-shadow: var(--shadow-premium);
-                    border-bottom: 1px solid var(--border-dashboard);
+                    box-shadow: 0 20px 60px rgba(62, 97, 255, 0.15);
+                    min-height: 200px;
                 }
 
-                .hero-visual { display: flex; align-items: center; gap: 40px; }
+                /* Decorative Background Patterns */
+                .profile-hero::before {
+                    content: '';
+                    position: absolute;
+                    top: -50%;
+                    left: -10%;
+                    width: 600px;
+                    height: 600px;
+                    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+                    border-radius: 50%;
+                }
+                .profile-hero::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -30%;
+                    right: -5%;
+                    width: 500px;
+                    height: 500px;
+                    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+                    border-radius: 50%;
+                }
+
+                .hero-visual { 
+                    position: relative; 
+                    z-index: 10; 
+                    display: flex; 
+                    flex-direction: column; 
+                    align-items: center; 
+                    gap: 16px; 
+                    text-align: center;
+                }
+
                 .avatar-badge {
-                    width: 120px;
-                    height: 120px;
-                    background: linear-gradient(135deg, #3E61FF 0%, #6366F1 100%);
-                    color: white;
-                    border-radius: 40px;
+                    width: 90px;
+                    height: 90px;
+                    background: white;
+                    color: #3E61FF;
+                    border-radius: 50%;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 3rem;
+                    font-size: 2.2rem;
                     font-weight: 900;
-                    box-shadow: 0 20px 40px rgba(62, 97, 255, 0.3);
-                    border: 4px solid var(--bg-main);
+                    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+                    border: 4px solid rgba(255,255,255,0.3);
+                    background-clip: padding-box;
+                    transition: transform 0.3s;
+                }
+                .avatar-badge:hover { transform: scale(1.05) rotate(3deg); }
+
+                .hero-text h1 { 
+                    font-size: 2.2rem; 
+                    font-weight: 900; 
+                    color: white; 
+                    letter-spacing: -0.04em; 
+                    margin: 0 0 6px 0; 
+                    text-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                }
+                .hero-text p { 
+                    font-size: 0.8rem; 
+                    color: white; 
+                    font-weight: 800; 
+                    margin: 0; 
+                    text-transform: uppercase;
+                    letter-spacing: 0.1em;
+                    background: rgba(255,255,255,0.2);
+                    padding: 5px 16px;
+                    border-radius: 100px;
+                    backdrop-filter: blur(10px);
+                    border: 1px solid rgba(255,255,255,0.3);
                 }
 
-                .hero-text h1 { font-size: 3.5rem; font-weight: 950; color: var(--text-main); letter-spacing: -0.04em; margin-bottom: 12px; }
-                .hero-text p { font-size: 1.1rem; color: var(--text-muted); font-weight: 600; margin: 0; }
-
-                /* SETTINGS CONTENT */
+                /* SETTINGS CONTENT - COMPACT CLEAN LAYOUT */
                 .settings-grid {
-                    max-width: 1100px;
-                    margin: 0 auto;
+                    max-width: 1200px;
+                    margin: 20px auto 60px; /* Reduced margin */
                     display: grid;
-                    grid-template-columns: 320px 1fr;
-                    gap: 60px;
-                    padding: 0 80px;
+                    grid-template-columns: 280px 1fr;
+                    gap: 40px;
+                    padding: 0 40px;
+                    align-items: start;
                 }
 
-                .side-nav { display: flex; flex-direction: column; gap: 12px; }
+                .side-nav { 
+                    display: flex; 
+                    flex-direction: column; 
+                    gap: 12px; 
+                }
+                
                 .nav-card {
-                    padding: 24px;
-                    border-radius: 20px;
+                    padding: 18px 24px;
+                    border-radius: 16px;
                     background: var(--card-dashboard);
                     border: 1px solid var(--border-dashboard);
                     display: flex;
                     align-items: center;
-                    gap: 16px;
+                    gap: 14px;
                     font-weight: 800;
                     color: var(--text-muted);
                     cursor: pointer;
                     transition: 0.2s;
+                    box-shadow: var(--shadow-sm);
+                    font-size: 0.9rem;
                 }
-                .nav-card.active { border-color: #3E61FF; color: #3E61FF; background: var(--theme-active-bg, #EBF5FF); }
-                .dark-theme .nav-card.active { --theme-active-bg: rgba(62, 97, 255, 0.1); }
+                .nav-card:hover { transform: translateX(5px); color: var(--color-brand-accent); }
+                .nav-card.active { 
+                    border-color: #3E61FF; 
+                    color: #3E61FF; 
+                    background: var(--bg-dashboard);
+                    box-shadow: 0 8px 20px rgba(62, 97, 255, 0.15);
+                }
+                .dark-theme .nav-card.active { background: rgba(62, 97, 255, 0.1); color: white; border-color: transparent; }
 
                 .main-settings-card {
                     background: var(--card-dashboard);
                     border: 1px solid var(--border-dashboard);
-                    border-radius: 32px;
-                    padding: 48px;
+                    border-radius: 24px;
+                    padding: 32px; /* Reduced padding */
                     box-shadow: var(--shadow-premium);
+                    min-height: auto;
                 }
 
                 .form-section-title {
                     font-size: 1.8rem;
                     font-weight: 950;
                     color: var(--text-main);
-                    margin-bottom: 24px;
+                    margin-bottom: 12px;
                     display: flex;
                     align-items: center;
                     gap: 16px;
                 }
-                .form-section-subtitle { font-size: 1rem; color: var(--text-muted); font-weight: 600; margin-bottom: 40px; }
+                .form-section-subtitle { font-size: 1rem; color: var(--text-muted); font-weight: 600; margin-bottom: 40px; line-height: 1.5; }
 
                 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
                 .full-col { grid-column: 1 / -1; }
@@ -182,19 +253,20 @@ const MyProfile = () => {
                     padding: 16px 20px;
                     border: 1.5px solid var(--border-dashboard);
                     border-radius: 16px;
-                    background: var(--card-dashboard);
+                    background: var(--bg-dashboard);
                     font-size: 1rem;
                     font-weight: 600;
                     color: var(--text-main);
                     outline: none;
                     transition: 0.2s;
                 }
-                .input-field:focus { border-color: #3E61FF; background: var(--bg-main); box-shadow: 0 0 0 4px rgba(62, 97, 255, 0.08); }
+                .input-field:focus { border-color: #3E61FF; background: var(--card-dashboard); box-shadow: 0 0 0 4px rgba(62, 97, 255, 0.1); }
                 .input-field:disabled { 
                     background: var(--bg-dashboard); 
                     color: var(--text-muted); 
                     cursor: not-allowed;
                     opacity: 0.7;
+                    border-color: transparent;
                 }
 
                 .email-lock-badge {
@@ -223,15 +295,17 @@ const MyProfile = () => {
                     align-items: center;
                     margin-bottom: 16px;
                     transition: 0.2s;
+                    background: var(--bg-dashboard);
                 }
-                .pref-card:hover { border-color: #3E61FF; background: var(--bg-dashboard); }
+                .pref-card:hover { border-color: #3E61FF; transform: translateY(-3px); }
 
                 .theme-toggle-group {
-                    background: var(--bg-dashboard);
+                    background: var(--card-dashboard);
                     padding: 6px;
                     border-radius: 14px;
                     display: flex;
                     gap: 4px;
+                    border: 1px solid var(--border-dashboard);
                 }
                 .theme-btn {
                     padding: 10px 20px;
@@ -247,13 +321,13 @@ const MyProfile = () => {
                     color: var(--text-muted);
                     background: transparent;
                 }
-                .theme-btn.active { background: var(--bg-main); color: #3E61FF; box-shadow: var(--shadow-premium); }
+                .theme-btn.active { background: var(--text-main); color: var(--bg-main); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 
                 .save-btn {
                     margin-top: 48px;
                     padding: 16px 36px;
-                    background: var(--text-main);
-                    color: var(--bg-main);
+                    background: var(--color-brand-accent);
+                    color: white;
                     border: none;
                     border-radius: 16px;
                     font-size: 1rem;
@@ -263,8 +337,9 @@ const MyProfile = () => {
                     align-items: center;
                     gap: 12px;
                     transition: 0.3s;
+                    box-shadow: 0 10px 25px rgba(62, 97, 255, 0.25);
                 }
-                .save-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(15, 23, 42, 0.2); }
+                .save-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(62, 97, 255, 0.4); }
 
                 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
             `}</style>
@@ -291,12 +366,7 @@ const MyProfile = () => {
                     >
                         <UserCircle size={22} /> Personal Settings
                     </div>
-                    <div
-                        className={`nav-card ${activeTab === 'security' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('security')}
-                    >
-                        <Shield size={22} /> Security & Privacy
-                    </div>
+
                     <div
                         className={`nav-card ${activeTab === 'preferences' ? 'active' : ''}`}
                         onClick={() => setActiveTab('preferences')}
@@ -360,47 +430,7 @@ const MyProfile = () => {
                         </>
                     )}
 
-                    {activeTab === 'security' && (
-                        <>
-                            <h2 className="form-section-title">
-                                <Shield size={28} color="#3E61FF" strokeWidth={3} /> Security Hub
-                            </h2>
-                            <p className="form-section-subtitle">Keep your account safe and manage how your data is used.</p>
 
-                            <div className="input-group full-col" style={{ marginBottom: '32px' }}>
-                                <label>Current Password</label>
-                                <div style={{ position: 'relative' }}>
-                                    <input
-                                        type={showPassword ? "text" : "password"}
-                                        placeholder="••••••••••••"
-                                        className="input-field"
-                                    />
-                                    <button
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-light)' }}
-                                    >
-                                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="pref-card">
-                                <div>
-                                    <div style={{ fontWeight: 850, color: 'var(--text-main)', marginBottom: '4px' }}>Two-Factor Authentication</div>
-                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Add an extra layer of security to your login.</div>
-                                </div>
-                                <div style={{ color: 'var(--color-brand-accent)', fontWeight: 900, fontSize: '0.75rem' }}>OFF</div>
-                            </div>
-
-                            <div className="pref-card">
-                                <div>
-                                    <div style={{ fontWeight: 850, color: 'var(--text-main)', marginBottom: '4px' }}>Encrypted Storage</div>
-                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>All uploaded CV assets are AES-256 encrypted.</div>
-                                </div>
-                                <Lock size={20} color="var(--color-success)" />
-                            </div>
-                        </>
-                    )}
 
                     {activeTab === 'preferences' && (
                         <>
@@ -435,7 +465,30 @@ const MyProfile = () => {
                                     <div style={{ fontWeight: 850, color: 'var(--text-main)', marginBottom: '4px' }}>Notification Alerts</div>
                                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Get email alerts for new job matches.</div>
                                 </div>
-                                <Bell size={20} color="var(--color-brand-accent)" />
+                                <div
+                                    onClick={() => setEmailNotifications(!emailNotifications)}
+                                    style={{
+                                        width: '44px',
+                                        height: '24px',
+                                        background: emailNotifications ? '#3E61FF' : '#CBD5E1',
+                                        borderRadius: '100px',
+                                        position: 'relative',
+                                        cursor: 'pointer',
+                                        transition: 'background-color 0.3s ease'
+                                    }}
+                                >
+                                    <div style={{
+                                        width: '20px',
+                                        height: '20px',
+                                        background: 'white',
+                                        borderRadius: '50%',
+                                        position: 'absolute',
+                                        top: '2px',
+                                        left: emailNotifications ? '22px' : '2px',
+                                        transition: 'left 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                    }} />
+                                </div>
                             </div>
 
                             <div className="pref-card">
@@ -444,7 +497,32 @@ const MyProfile = () => {
                                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Set your default app language.</div>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 800, color: 'var(--text-main)' }}>
-                                    <Globe size={18} /> English (US)
+                                    <div style={{ position: 'relative' }}>
+                                        <Globe size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-muted)' }} />
+                                        <select
+                                            value={language}
+                                            onChange={(e) => setLanguage(e.target.value)}
+                                            style={{
+                                                appearance: 'none',
+                                                padding: '10px 16px 10px 40px',
+                                                borderRadius: '12px',
+                                                border: '1px solid var(--border-dashboard)',
+                                                background: 'var(--bg-dashboard)',
+                                                fontWeight: '800',
+                                                color: 'var(--text-main)',
+                                                cursor: 'pointer',
+                                                fontSize: '0.9rem',
+                                                minWidth: '160px',
+                                                outline: 'none'
+                                            }}
+                                        >
+                                            <option value="en">English (US)</option>
+                                            <option value="es">Español (ES)</option>
+                                            <option value="fr">Français (FR)</option>
+                                            <option value="de">Deutsch (DE)</option>
+                                            <option value="jp">日本語 (JP)</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </>

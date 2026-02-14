@@ -9,22 +9,29 @@ import {
     Users,
     BarChart3,
     TrendingUp,
-    FileText
+    FileText,
+    Download
 } from 'lucide-react';
+import applicationService from '@/services/applicationService';
 
 const EmployerDashboard = () => {
     const [user, setUser] = React.useState(authService.getCurrentUser());
+    const [applications, setApplications] = React.useState([]);
 
     React.useEffect(() => {
-        const fetchUserData = async () => {
+        const fetchData = async () => {
             try {
                 const userData = await authService.fetchCurrentUser();
                 setUser(userData);
+
+                // Fetch Applications
+                const apps = await applicationService.getAllApplications();
+                setApplications(apps || []);
             } catch (err) {
-                console.error("Failed to fetch employer dashboard data", err);
+                console.error("Failed to fetch dashboard data", err);
             }
         };
-        fetchUserData();
+        fetchData();
     }, []);
 
     // Static stats for the top section
@@ -241,6 +248,66 @@ const EmployerDashboard = () => {
                             <tr>
                                 <td colSpan="5" style={{ ...styles.td, textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                                     No jobs posted yet. Click "Post New Job" to get started!
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Recent Applications Section - Dynamic */}
+            <div style={{ ...styles.managementHeader, marginTop: '40px' }}>
+                <h2 style={{ fontSize: '1.4rem', fontWeight: '800' }}>Recent Applications</h2>
+            </div>
+
+            <div style={styles.tableCard}>
+                <table style={styles.table}>
+                    <thead>
+                        <tr>
+                            <th style={styles.th}>Candidate</th>
+                            <th style={styles.th}>Applying For</th>
+                            <th style={styles.th}>CV / Resume</th>
+                            <th style={styles.th}>Applied Date</th>
+                            <th style={styles.th}>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {applications.length > 0 ? (
+                            applications.map((app) => (
+                                <tr key={app.id} className="table-row">
+                                    <td style={styles.td}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#E0E7FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3E61FF', fontWeight: 'bold' }}>
+                                                {app.JobSeeker?.first_name?.charAt(0) || 'U'}
+                                            </div>
+                                            <div>
+                                                <div style={{ fontWeight: '600' }}>{app.JobSeeker?.first_name} {app.JobSeeker?.last_name}</div>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{app.JobSeeker?.email}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style={styles.td}>
+                                        <span style={{ fontWeight: '500' }}>{app.job_id}</span>
+                                    </td>
+                                    <td style={styles.td}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <FileText size={16} color="var(--text-muted)" />
+                                            <span>{app.CV?.title || 'CV Document'}</span>
+                                            {/* Download link would go here */}
+                                        </div>
+                                    </td>
+                                    <td style={styles.td}>{new Date(app.applied_at).toLocaleDateString()}</td>
+                                    <td style={styles.td}>
+                                        <span style={styles.statusBadge(app.status || 'Pending')}>
+                                            {app.status || 'Pending'}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="5" style={{ ...styles.td, textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
+                                    No applications received yet.
                                 </td>
                             </tr>
                         )}

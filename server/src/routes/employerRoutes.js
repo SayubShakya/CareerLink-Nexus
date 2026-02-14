@@ -9,8 +9,11 @@ router.use(authMiddleware.protect);
 // Restrict to only employers
 router.use(authMiddleware.restrictTo('employer'));
 
+const applicationController = require('../controllers/applicationController'); // New Import
+
 // Routes specific to employer
 router.get('/me', employerController.getMe);
 router.patch('/me', employerController.updateMe);
+router.get('/applications', applicationController.getAllApplications); // View applications for dashboard
 
 module.exports = router;

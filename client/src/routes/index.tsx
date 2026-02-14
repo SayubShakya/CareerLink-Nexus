@@ -15,6 +15,8 @@ import CVBuilder from '../pages/cv-builder/CVBuilder';
 import MyProfile from '../pages/jobseeker/MyProfile';
 import MyCVs from '../pages/jobseeker/MyCVs';
 import FindJobs from '../pages/jobseeker/FindJobs';
+import PublicFindJobs from '../pages/jobs/PublicFindJobs';
+import JobDescription from '../pages/jobs/JobDescription';
 import EmployerLayout from '../components/layout/employer/EmployerLayout';
 import JobseekerLayout from '../components/layout/jobseeker/JobseekerLayout';
 import LogoutConfirmation from '../pages/auth/LogoutConfirmation';
@@ -51,8 +53,12 @@ export const router = createBrowserRouter([
                 element: <EmployerSignup />,
             },
             {
-                path: ROUTES.JOBS,
-                element: <Jobs />,
+                path: '/find-jobs',
+                element: <PublicFindJobs />,
+            },
+            {
+                path: '/jobs/:id',
+                element: <JobDescription />,
             },
             {
                 path: ROUTES.CONTACT_US,
@@ -85,6 +91,10 @@ export const router = createBrowserRouter([
             {
                 path: ROUTES.JOBSEEKER_FIND_JOBS,
                 element: <FindJobs />,
+            },
+            {
+                path: '/jobseeker/jobs/:id',
+                element: <JobDescription />,
             },
             {
                 path: ROUTES.MY_CVS,
