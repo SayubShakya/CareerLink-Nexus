@@ -22,6 +22,13 @@
     /* Gray 400 */
     --text-inverse: #FFFFFF;
 
+    /* Dashboard Theme (ASPECT) */
+    --bg-dashboard: #F1F5F9;
+    /* Soft Slate */
+    --card-dashboard: #FFFFFF;
+    --border-dashboard: #E2E8F0;
+    --accent-signal: #3E61FF;
+
     /* Status */
     --color-success: #10B981;
     --color-danger: #EF4444;
@@ -52,4 +59,22 @@
     /* Fixed Header */
     --header-height: 80px;
     --container-max-width: 1280px;
+}
+
+/* Dark Theme Overrides */
+.dark-theme {
+    --bg-main: #050A1A;
+    --bg-subtle: #0A1125;
+    --bg-dashboard: #020617;
+    --card-dashboard: #0A1125;
+    --border-dashboard: #1E293B;
+    --bg-glass: rgba(10, 17, 37, 0.85);
+
+    --text-main: #F8FAFC;
+    --text-muted: #94A3B8;
+    --text-light: #64748B;
+    --text-inverse: #050A1A;
+
+    --border-subtle: rgba(255, 255, 255, 0.06);
+    --shadow-premium: 0 10px 40px -10px rgba(0, 0, 0, 0.4);
 }

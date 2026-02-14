@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import JobCard from '../../components/jobs/JobCard';
+import JobCard from '../../components/features/JobCard/JobCard';
 
 const MOCK_JOBS = [
     {

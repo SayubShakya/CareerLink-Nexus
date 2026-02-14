@@ -1,359 +1,391 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import authService from '@/services/authService';
+import { ROUTES } from '@/routes/routes';
 import {
-    Search,
-    FilePlus,
-    ClipboardList,
-    CheckCircle,
-    Clock,
-    XCircle,
-    Bell,
-    Settings,
-    MapPin,
     Briefcase,
-    Filter,
-    ChevronRight,
-    Building2,
-    DollarSign,
-    Calendar,
-    Star,
-    Zap,
-    Bookmark,
-    TrendingUp,
     FileText,
-    Target
+    ArrowUpRight,
+    Search,
+    Shield,
+    ChevronLeft,
+    ChevronRight
 } from 'lucide-react';
+
+import heroBg from '@assets/images/job-seeker-img.jpg';
 
 const JobSeekerDashboard = () => {
     const [user, setUser] = useState(authService.getCurrentUser());
     const location = useLocation();
-    const [activeView, setActiveView] = useState('overview');
-    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
 
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                // Fetch latest data from server
                 const userData = await authService.fetchCurrentUser();
                 setUser(userData);
             } catch (err) {
                 console.error("Failed to fetch user data for dashboard", err);
-            } finally {
-                setLoading(false);
             }
         };
         fetchUserData();
     }, []);
 
-    // Update view based on URL hash or just keep it in state
-    useEffect(() => {
-        // If we want to handle navbar clicks that lead here
-        if (location.hash === '#find-jobs') {
-            setActiveView('find-jobs');
-        } else {
-            setActiveView('overview');
-        }
-    }, [location]);
-
-    // Elite Actionable Metrics - 7 Key Indicators
     const stats = [
-        { label: 'Total Applied', value: '24', icon: <Briefcase size={20} />, color: '#3E61FF', bg: '#EFF4FF' },
-        { label: 'CVs Uploaded', value: '3', icon: <FileText size={20} />, color: '#8B5CF6', bg: '#F5F3FF' },
-        { label: 'Pending', value: '12', icon: <Clock size={20} />, color: '#F59E0B', bg: '#FFFBEB' },
-        { label: 'Shortlisted', value: '5', icon: <Target size={20} />, color: '#10B981', bg: '#ECFDF5' },
-        { label: 'Interviews', value: '2', icon: <Calendar size={20} />, color: '#F43F5E', bg: '#FFF1F2' },
-        { label: 'Offers', value: '1', icon: <CheckCircle size={20} />, color: '#06B6D4', bg: '#ECFEFF' },
+        { label: 'Jobs Applied', value: '24', trend: 'Total count' },
+        { label: 'My Resumes', value: '3', trend: 'In your files' },
+        { label: 'Under Review', value: '12', trend: 'Active jobs', highlight: true },
+        { label: 'Interview Calls', value: '5', trend: 'Shortlisted', color: '#0F172A' },
     ];
 
-    const recentApplications = [
-        { id: 1, company: 'Google', role: 'Senior UX Designer', status: 'Pending', date: '2 days ago', location: 'Mountain View, CA', logo: 'G' },
-        { id: 2, company: 'Meta', role: 'Product Manager', status: 'Interview', date: '1 week ago', location: 'Menlo Park, CA', logo: 'M' },
-        { id: 3, company: 'Amazon', role: 'Software Developer', status: 'Accepted', date: '2 weeks ago', location: 'Seattle, WA', logo: 'A' },
-        { id: 4, company: 'Microsoft', role: 'Cloud Architect', status: 'Rejected', date: '3 weeks ago', location: 'Redmond, WA', logo: 'M' },
-        { id: 5, company: 'Netflix', role: 'Senior UI Engineer', status: 'Interview', date: '4 days ago', location: 'Los Gatos, CA', logo: 'N' },
-        { id: 6, company: 'Tesla', role: 'Full Stack Engineer', status: 'Pending', date: '1 day ago', location: 'Austin, TX', logo: 'T' },
-        { id: 7, company: 'Spotify', role: 'Backend Developer', status: 'Pending', date: '5 days ago', location: 'Stockholm, SE', logo: 'S' },
-        { id: 8, company: 'Adobe', role: 'Product Designer', status: 'Interview', date: '2 weeks ago', location: 'San Jose, CA', logo: 'A' },
-        { id: 9, company: 'Slack', role: 'Engineering Manager', status: 'Accepted', date: '1 month ago', location: 'San Francisco, CA', logo: 'S' },
-        { id: 10, company: 'Airbnb', role: 'Frontend Lead', status: 'Rejected', date: '2 weeks ago', location: 'San Francisco, CA', logo: 'A' },
+    const pipelineData = [
+        { id: 1, role: 'Senior UX Designer', company: 'Google', loc: 'Mountain View, CA', status: 'Reviewing', logo: 'G' },
+        { id: 2, role: 'Product Manager', company: 'Meta', loc: 'Menlo Park, CA', status: 'Interview', logo: 'M' },
+        { id: 3, role: 'Staff Software Engineer', company: 'Amazon', loc: 'Seattle, WA', status: 'Accepted', logo: 'A' },
+        { id: 4, role: 'Cloud Architect', company: 'Microsoft', loc: 'Remote', status: 'Pending', logo: 'M' },
+        { id: 5, role: 'AI Researcher', company: 'NVIDIA', loc: 'Santa Clara, CA', status: 'Rejected', logo: 'N' },
+        { id: 6, role: 'Full Stack Engineer', company: 'Netflix', loc: 'Los Gatos, CA', status: 'Interview', logo: 'N' },
+        { id: 7, role: 'Systems Architect', company: 'Apple', loc: 'Cupertino, CA', status: 'Reviewing', logo: 'A' },
+        { id: 8, role: 'Data Scientist', company: 'Palantir', loc: 'Denver, CO', status: 'Pending', logo: 'P' },
+        { id: 9, role: 'Security Analyst', company: 'Cloudflare', loc: 'Remote', status: 'Applied', logo: 'C' },
+        { id: 10, role: 'Lead DevOps', company: 'Docker', loc: 'Remote', status: 'Reviewing', logo: 'D' },
     ];
 
-    const availableJobs = [
-        { id: 1, company: 'Google', role: 'Senior UX Designer', level: 'Senior Level', type: 'Full Time', location: 'Mountain View, CA', salary: '$180k - $240k', tags: ['Figma', 'React'], deadline: '3 days left', logoChar: 'G', isNew: true },
-        { id: 2, company: 'Meta', role: 'Product Manager', level: 'Mid Level', type: 'Full Time', location: 'Menlo Park, CA', salary: '$160k - $210k', tags: ['Agile', 'Vision'], deadline: '1 week left', logoChar: 'M', isNew: false },
-        { id: 3, company: 'Amazon', role: 'Cloud Architect', level: 'Senior Level', type: 'Remote', location: 'Seattle, WA', salary: '$170k - $230k', tags: ['AWS', 'Scale'], deadline: '2 days left', logoChar: 'A', isNew: true },
-        { id: 4, company: 'Apple', role: 'iOS Developer', level: 'Mid Level', type: 'Full Time', location: 'Cupertino, CA', salary: '$150k - $200k', tags: ['Swift', 'UIKit'], deadline: '5 days left', logoChar: 'A', isNew: false },
-        { id: 5, company: 'Netflix', role: 'Streaming Engineering Lead', level: 'Senior Level', type: 'Full Time', location: 'Los Gatos, CA', salary: '$200k - $300k', tags: ['Java', 'C++'], deadline: '4 days left', logoChar: 'N', isNew: true },
-        { id: 6, company: 'Spotify', role: 'Data Scientist', level: 'Mid Level', type: 'Remote', location: 'New York, NY', salary: '$140k - $190k', tags: ['Python', 'SQL'], deadline: '6 days left', logoChar: 'S', isNew: false },
-        { id: 7, company: 'Tesla', role: 'Autopilot Engineer', level: 'Senior Level', type: 'Full Time', location: 'Austin, TX', salary: '$180k - $250k', tags: ['C++', 'AI'], deadline: '2 days left', logoChar: 'T', isNew: true },
-        { id: 8, company: 'Slack', role: 'Frontend Engineer', level: 'Mid Level', type: 'Full Time', location: 'San Francisco, CA', salary: '$130k - $170k', tags: ['React', 'TS'], deadline: '1 week left', logoChar: 'S', isNew: false },
-        { id: 9, company: 'Adobe', role: 'Creative Cloud Specialist', level: 'Mid Level', type: 'Full Time', location: 'San Jose, CA', salary: '$140k - $180k', tags: ['Design', 'UX'], deadline: 'Expired', logoChar: 'A', isNew: false },
-        { id: 10, company: 'Airbnb', role: 'Design Lead', level: 'Senior Level', type: 'Remote', location: 'Remote', salary: '$170k - $240k', tags: ['Product', 'Brand'], deadline: '3 days left', logoChar: 'A', isNew: true },
-    ];
+    // Pagination Logic
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = pipelineData.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(pipelineData.length / itemsPerPage);
 
-    const styles = {
-        container: {
-            padding: '30px 40px',
-            maxWidth: '1400px',
-            margin: '0 auto',
-        },
-        statsGrid: {
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-            gap: '20px',
-            marginBottom: '40px'
-        },
-        statCard: {
-            backgroundColor: 'white',
-            padding: '24px',
-            borderRadius: '20px',
-            border: '1px solid var(--border-subtle)',
-            transition: 'all 0.3s ease',
-            cursor: 'default'
-        },
-        statIcon: (bg, color) => ({
-            width: '44px',
-            height: '44px',
-            borderRadius: '12px',
-            backgroundColor: bg,
-            color: color,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: '16px'
-        }),
-        contentGrid: {
-            display: 'grid',
-            gridTemplateColumns: '1fr',
-            gap: '32px'
-        },
-        sectionHeader: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '20px'
-        },
-        sectionTitle: {
-            fontSize: '1.25rem',
-            fontWeight: '800',
-            color: 'var(--text-main)',
-            letterSpacing: '-0.02em'
-        },
-        appCard: {
-            backgroundColor: 'white',
-            padding: '20px',
-            borderRadius: '20px',
-            border: '1px solid var(--border-subtle)',
-            marginBottom: '16px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            transition: 'all 0.2s'
-        },
-        statusBadge: (status) => {
-            const colors = {
-                'Pending': { bg: '#FFFBEB', color: '#F59E0B' },
-                'Interview': { bg: '#F5F3FF', color: '#8B5CF6' },
-                'Accepted': { bg: '#ECFDF5', color: '#10B981' },
-                'Rejected': { bg: '#FFF1F2', color: '#F43F5E' }
-            };
-            const { bg, color } = colors[status] || { bg: '#F3F4F6', color: '#4B5563' };
-            return {
-                padding: '6px 12px',
-                borderRadius: '8px',
-                fontSize: '0.75rem',
-                fontWeight: '700',
-                backgroundColor: bg,
-                color: color
-            };
-        },
-        hero: {
-            background: 'var(--color-brand-primary)',
-            borderRadius: '24px',
-            padding: '50px 40px',
-            color: 'white',
-            marginBottom: '32px',
-            position: 'relative',
-            overflow: 'hidden'
-        },
-        searchIsland: {
-            display: 'flex',
-            backgroundColor: 'white',
-            borderRadius: '16px',
-            padding: '8px',
-            gap: '12px',
-            boxShadow: '0 15px 35px rgba(0,0,0,0.1)',
-            marginTop: '30px'
-        },
-        sidebarCard: {
-            backgroundColor: 'white',
-            padding: '24px',
-            borderRadius: '24px',
-            border: '1px solid var(--border-subtle)',
-            marginBottom: '24px'
-        },
-        applyBtn: {
-            backgroundColor: 'var(--color-brand-primary)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '10px',
-            padding: '10px 20px',
-            fontWeight: '700',
-            fontSize: '0.85rem',
-            cursor: 'pointer',
-            transition: 'all 0.2s'
-        }
+    const paginate = (pageNumber) => {
+        setCurrentPage(pageNumber);
     };
 
     return (
-        <div style={styles.container}>
-            {activeView === 'overview' ? (
-                <>
-                    {/* Elite Metrics Grid - 6 Actionable Points */}
-                    <div style={styles.statsGrid}>
-                        {stats.map((stat, i) => (
-                            <div key={i} style={styles.statCard} className="hover-lift">
-                                <div style={styles.statIcon(stat.bg, stat.color)}>
-                                    {stat.icon}
+        <div className="dashboard-root">
+            <style>{`
+                .dashboard-root {
+                    min-height: 100vh;
+                    background-color: var(--bg-dashboard);
+                    color: var(--text-main);
+                    padding: 40px 80px;
+                    font-family: 'Inter', system-ui, sans-serif;
+                    transition: background-color 0.3s;
+                }
+
+                /* UNIFIED HERO BOX */
+                .hero-premium-box {
+                    display: grid;
+                    grid-template-columns: 1fr 440px;
+                    background: var(--card-dashboard);
+                    border: 1px solid var(--border-dashboard);
+                    border-radius: 24px;
+                    overflow: hidden;
+                    box-shadow: var(--shadow-premium);
+                    margin-bottom: 64px;
+                    height: 480px;
+                }
+
+                .hero-visual-side {
+                    background-image: url(${heroBg});
+                    background-size: contain;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-color: var(--bg-main);
+                    border-right: 1px solid var(--border-dashboard);
+                }
+
+                .hero-stats-side {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    grid-template-rows: 1fr 1fr;
+                    background: var(--bg-dashboard);
+                    gap: 1px;
+                }
+
+                .stat-tile {
+                    background: var(--card-dashboard);
+                    padding: 40px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    text-align: center;
+                    transition: all 0.3s ease;
+                }
+
+                .stat-tile:hover { background: var(--bg-subtle); }
+                .stat-tile.active-pipeline { background: var(--bg-subtle); border: 2px solid var(--color-brand-accent); }
+
+                .tile-label {
+                    font-size: 0.75rem;
+                    font-weight: 800;
+                    color: var(--text-muted);
+                    text-transform: uppercase;
+                    letter-spacing: 0.15em;
+                    margin-bottom: 12px;
+                }
+
+                .tile-val {
+                    font-size: 3.5rem;
+                    font-weight: 950;
+                    line-height: 1;
+                    margin-bottom: 8px;
+                    color: var(--text-main);
+                    letter-spacing: -0.04em;
+                }
+
+                .stat-tile.active-pipeline .tile-val { color: var(--color-brand-accent); }
+                .tile-trend { font-size: 0.8rem; font-weight: 700; color: var(--text-light); }
+
+                /* CONTENT FEED */
+                .main-dashboard-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 340px;
+                    gap: 64px;
+                }
+
+                .section-header-block { margin-bottom: 40px; }
+                .section-label {
+                    font-size: 0.8rem;
+                    font-weight: 800;
+                    color: var(--color-brand-accent);
+                    text-transform: uppercase;
+                    letter-spacing: 0.15em;
+                    margin-bottom: 8px;
+                    display: block;
+                }
+
+                .dashboard-title {
+                    font-size: 2.5rem;
+                    font-weight: 950;
+                    letter-spacing: -0.03em;
+                    color: var(--text-main);
+                    margin: 0;
+                }
+
+                .pipeline-item {
+                    background: var(--card-dashboard);
+                    border: 1px solid var(--border-dashboard);
+                    border-radius: 16px;
+                    padding: 24px 32px;
+                    margin-bottom: 16px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+
+                .pipeline-item:hover { 
+                    border-color: var(--color-brand-accent); 
+                    transform: translateY(-3px); 
+                    box-shadow: var(--shadow-premium); 
+                }
+
+                .item-info { display: flex; align-items: center; gap: 24px; }
+                .company-badge {
+                    width: 52px;
+                    height: 52px;
+                    background: var(--bg-dashboard);
+                    border: 1px solid var(--border-dashboard);
+                    border-radius: 14px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 900;
+                    font-size: 1.25rem;
+                    color: var(--text-main);
+                }
+
+                .role-name { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; color: var(--text-main); }
+                .company-meta { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+
+                .status-chip {
+                    padding: 8px 18px;
+                    border-radius: 8px;
+                    font-size: 0.72rem;
+                    font-weight: 850;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    background: var(--bg-dashboard);
+                    color: var(--text-muted);
+                    border: 1px solid transparent;
+                    min-width: 100px;
+                    text-align: center;
+                }
+
+                .status-chip.reviewing { background: var(--bg-subtle); color: var(--text-muted); border: 1px solid var(--border-dashboard); }
+                .status-chip.interview { background: rgba(62, 97, 255, 0.1); color: var(--color-brand-accent); border: 1px solid var(--color-brand-accent); }
+                .status-chip.pending { background: #FFFBEB; color: #D97706; border: 1px solid #FEF3C7; }
+                .status-chip.accepted { background: #ECFDF5; color: #059669; border: 1px solid #D1FAE5; }
+                .status-chip.rejected { background: #FEF2F2; color: #DC2626; border: 1px solid #FEE2E2; }
+                .status-chip.applied { background: var(--bg-dashboard); color: var(--text-muted); border: 1px solid var(--border-dashboard); }
+
+                /* PAGINATION STYLES */
+                .pagination-tray {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    margin-top: 48px;
+                }
+
+                .page-btn {
+                    width: 40px;
+                    height: 40px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 10px;
+                    border: 1px solid var(--border-dashboard);
+                    background: var(--card-dashboard);
+                    color: var(--text-muted);
+                    font-weight: 700;
+                    font-size: 0.85rem;
+                    cursor: pointer;
+                    transition: 0.2s;
+                }
+
+                .page-btn:hover:not(:disabled) { border-color: var(--color-brand-accent); color: var(--color-brand-accent); background: var(--bg-subtle); }
+                .page-btn.active { background: var(--text-main); color: var(--bg-main); border-color: var(--text-main); }
+                .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+                /* SIDEBAR */
+                .management-sidebar { position: sticky; top: 120px; }
+                .sidebar-label {
+                    font-size: 0.75rem;
+                    font-weight: 850;
+                    color: var(--text-light);
+                    text-transform: uppercase;
+                    letter-spacing: 0.15em;
+                    margin-bottom: 32px;
+                    display: block;
+                }
+
+                .nav-action-item {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 24px 0;
+                    border-bottom: 1.5px solid var(--border-dashboard);
+                    text-decoration: none;
+                    color: var(--text-muted);
+                    font-weight: 800;
+                    font-size: 0.95rem;
+                    transition: 0.2s ease;
+                }
+
+                .nav-action-item:hover { 
+                    color: var(--color-brand-accent); 
+                    padding-left: 12px;
+                    border-bottom-color: var(--color-brand-accent); 
+                }
+
+                .nav-action-item span { display: flex; align-items: center; gap: 14px; }
+            `}</style>
+
+            {/* HERO BOX */}
+            <div className="hero-premium-box">
+                <div className="hero-visual-side"></div>
+                <div className="hero-stats-side">
+                    {stats.map((s, i) => (
+                        <div key={i} className={`stat-tile ${s.highlight ? 'active-pipeline' : ''}`}>
+                            <span className="tile-label">{s.label}</span>
+                            <span className="tile-val">{s.value}</span>
+                            <span className="tile-trend">{s.trend}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* MAIN FEED */}
+            <div className="main-dashboard-grid">
+                <div className="pipeline-section">
+                    <div className="section-header-block">
+                        <span className="section-label">Application Status</span>
+                        <h1 className="dashboard-title">Applied Jobs</h1>
+                    </div>
+
+                    <div className="pipeline-feed">
+                        {currentItems.map((app) => (
+                            <div key={app.id} className="pipeline-item">
+                                <div className="item-info">
+                                    <div className="company-badge">{app.logo}</div>
+                                    <div className="text-content">
+                                        <div className="role-name">{app.role}</div>
+                                        <div className="company-meta">
+                                            <span>{app.company}</span>
+                                            <span style={{ opacity: 0.3 }}>•</span>
+                                            <span>{app.loc}</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                    {stat.label}
-                                </p>
-                                <p style={{ fontSize: '1.75rem', fontWeight: '900', color: 'var(--text-main)', marginTop: '4px' }}>
-                                    {stat.value}
-                                </p>
+                                <div className={`status-chip ${app.status.toLowerCase()}`}>
+                                    {app.status}
+                                </div>
                             </div>
                         ))}
                     </div>
 
-                    <div style={styles.contentGrid}>
-                        {/* Main Stream - Full Width */}
-                        <div>
-                            <div style={styles.sectionHeader}>
-                                <h2 style={styles.sectionTitle}>Pipeline Overview</h2>
-                                <button style={{ background: 'none', border: 'none', color: 'var(--color-brand-accent)', fontWeight: '700', cursor: 'pointer', fontSize: '0.9rem' }}>
-                                    View Detailed Calendar
-                                </button>
-                            </div>
-                            {recentApplications.map((app) => (
-                                <div
-                                    key={app.id}
-                                    style={{ ...styles.appCard, cursor: 'pointer' }}
-                                    className="hover-glow"
-                                    onClick={() => console.log('Viewing details for:', app.role)}
-                                >
-                                    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                                        <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#F8F9FA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', color: 'var(--color-brand-primary)' }}>
-                                            {app.logo}
-                                        </div>
-                                        <div>
-                                            <h3 style={{ fontSize: '1rem', fontWeight: '700' }}>{app.role}</h3>
-                                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>{app.company} • {app.location}</p>
-                                        </div>
-                                    </div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        <div style={styles.statusBadge(app.status)}>{app.status.toUpperCase()}</div>
-                                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '6px' }}>{app.date}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                    {/* PAGINATION TRAY */}
+                    <div className="pagination-tray">
+                        <button
+                            className="page-btn"
+                            onClick={() => paginate(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        >
+                            <ChevronLeft size={18} />
+                        </button>
+
+                        {[...Array(totalPages)].map((_, i) => (
+                            <button
+                                key={i + 1}
+                                className={`page-btn ${currentPage === i + 1 ? 'active' : ''}`}
+                                onClick={() => paginate(i + 1)}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+
+                        <button
+                            className="page-btn"
+                            onClick={() => paginate(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                        >
+                            <ChevronRight size={18} />
+                        </button>
                     </div>
-                </>
-            ) : (
-                <>
-                    {/* REDESIGNED FIND JOBS PORTAL */}
-                    <div style={styles.hero}>
-                        <div style={{ position: 'relative', zIndex: 1 }}>
-                            <h1 style={{ fontSize: '2.5rem', fontWeight: '900', letterSpacing: '-0.04em', lineHeight: '1.1' }}>
-                                The Future of <br /> Work is Here.
-                            </h1>
-                            <p style={{ opacity: 0.8, marginTop: '12px', fontSize: '1.1rem' }}>
-                                Personalized discovery for world-class talent.
-                            </p>
+                </div>
 
-                            <div style={styles.searchIsland}>
-                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '16px' }}>
-                                    <Search size={20} color="var(--color-brand-primary)" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search jobs by title, company, or location..."
-                                        style={{ border: 'none', outline: 'none', width: '100%', fontSize: '1rem', fontWeight: '500' }}
-                                    />
-                                </div>
-                                <button style={{ background: 'var(--color-brand-primary)', color: 'white', border: 'none', borderRadius: '12px', padding: '0 32px', fontWeight: '800', cursor: 'pointer', transition: 'all 0.2s' }}>
-                                    Search
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                {/* SIDEBAR */}
+                <div className="management-sidebar">
+                    <span className="sidebar-label">Quick Management</span>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '32px' }}>
-                        {/* Jobs Grid - Centered/Refined Padding */}
-                        <div>
-                            <div style={styles.sectionHeader}>
-                                <h2 style={styles.sectionTitle}>Available Opportunities</h2>
-                                <div style={{ display: 'flex', gap: '8px' }}>
-                                    <button style={{ padding: '6px 12px', background: 'white', border: '1px solid var(--border-subtle)', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '600' }}><Filter size={14} /></button>
-                                </div>
-                            </div>
+                    <Link to={ROUTES.JOBSEEKER_FIND_JOBS} className="nav-action-item">
+                        <span><Search size={22} color="#3E61FF" strokeWidth={2.5} /> Find Jobs</span>
+                        <ArrowUpRight size={18} />
+                    </Link>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
-                                {availableJobs.map((job) => (
-                                    <div
-                                        key={job.id}
-                                        style={{ ...styles.appCard, flexDirection: 'column', alignItems: 'flex-start', padding: '28px', minHeight: '300px', cursor: 'pointer' }}
-                                        className="hover-glow"
-                                        onClick={() => console.log('Viewing job:', job.role)}
-                                    >
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '24px' }}>
-                                            <div style={{ width: '60px', height: '60px', borderRadius: '18px', background: '#F8F9FA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: '900', color: 'var(--color-brand-primary)', border: '1px solid var(--border-subtle)' }}>
-                                                {job.logoChar}
-                                            </div>
-                                            <div style={{ display: 'flex', gap: '8px' }}>
-                                                {job.isNew && <span style={{ background: '#F0FDF4', color: '#15803D', fontSize: '0.7rem', fontWeight: '800', padding: '6px 10px', borderRadius: '8px', height: 'fit-content' }}>NEW ROLE</span>}
-                                            </div>
-                                        </div>
+                    <Link to={ROUTES.CV_BUILDER} className="nav-action-item">
+                        <span><FileText size={22} color="#3E61FF" strokeWidth={2.5} /> Build CV</span>
+                        <ArrowUpRight size={18} />
+                    </Link>
 
-                                        <div style={{ marginBottom: '16px' }}>
-                                            <h3 style={{ fontSize: '1.4rem', fontWeight: '900', color: 'var(--text-main)', letterSpacing: '-0.03em', lineHeight: '1.2' }}>{job.role}</h3>
-                                            <p style={{ color: 'var(--color-brand-accent)', fontSize: '0.95rem', fontWeight: '700', marginTop: '4px' }}>{job.company}</p>
-                                        </div>
+                    <Link to={ROUTES.MY_CVS} className="nav-action-item">
+                        <span><Briefcase size={22} color="#3E61FF" strokeWidth={2.5} /> CV Storage</span>
+                        <ArrowUpRight size={18} />
+                    </Link>
 
-                                        <div style={{ display: 'flex', gap: '20px', fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '20px' }}>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><MapPin size={16} />{job.location}</span>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><DollarSign size={16} />{job.salary}</span>
-                                        </div>
-
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginTop: 'auto', paddingTop: '20px', borderTop: '1px solid #F9FAFB' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#EF4444', fontWeight: '700' }}>
-                                                <Calendar size={16} /> {job.deadline}
-                                            </div>
-                                            <button style={{ ...styles.applyBtn, padding: '12px 28px', fontSize: '0.9rem' }}>Quick Apply</button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </>
-            )}
-
-            <style>{`
-                .hover-lift:hover {
-                    box-shadow: 0 15px 35px rgba(0,0,0,0.06);
-                    transform: translateY(-4px);
-                    border-color: var(--color-brand-primary);
-                }
-                .hover-glow:hover {
-                    box-shadow: 0 10px 25px rgba(62, 97, 255, 0.05);
-                    border-color: rgba(62, 97, 255, 0.3);
-                }
-                input:focus {
-                    background-color: #F9FAFB;
-                }
-            `}</style>
+                    <Link to={ROUTES.JOBSEEKER_PROFILE} className="nav-action-item">
+                        <span><Shield size={22} color="#3E61FF" strokeWidth={2.5} /> My Account</span>
+                        <ArrowUpRight size={18} />
+                    </Link>
+                </div>
+            </div>
         </div>
     );
 };

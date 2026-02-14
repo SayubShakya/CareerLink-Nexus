@@ -1,6 +1,6 @@
-import Hero from '@/components/hero/hero';
-import StatsSection from '@/components/stats-section/StatsSection';
-import Slider from '@/components/common/Slider';
+import Hero from '@/components/features/Hero/Hero';
+import StatsSection from '@/components/features/StatsSection/StatsSection';
+import Slider from '@/components/ui/Slider';
 import meshBg from '@/assets/images/mesh-bg.png';
 
 export default function Home() {

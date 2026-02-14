@@ -1,4 +1,6 @@
-import api from './api';
+import api from '@/api/client';
+import { STORAGE_KEYS } from '@/config/constants';
+import { API_ENDPOINTS } from '@/api/endpoints';
 
 /**
  * Single Responsibility: Manage Authentication API calls and related local storage state.
@@ -8,7 +10,7 @@ class AuthService {
      * Unified login for both Job Seekers and Employers
      */
     async login(email, password) {
-        const response = await api.post('/auth/login', { email, password });
+        const response = await api.post(API_ENDPOINTS.AUTH.LOGIN, { email, password });
         if (response.data.token) {
             this._setSession(response.data.token, response.data.data.user, response.data.data.role);
         }
@@ -27,7 +29,7 @@ class AuthService {
             password: userData.password
         };
 
-        const response = await api.post('/auth/register/job-seeker', payload);
+        const response = await api.post(API_ENDPOINTS.AUTH.REGISTER_JOB_SEEKER, payload);
         // We no longer auto-login after registration as per user request
         /*
         if (response.data.token) {
@@ -49,7 +51,7 @@ class AuthService {
             password: userData.password
         };
 
-        const response = await api.post('/auth/register/employer', payload);
+        const response = await api.post(API_ENDPOINTS.AUTH.REGISTER_EMPLOYER, payload);
         // We no longer auto-login after registration as per user request
         /*
         if (response.data.token) {
@@ -64,21 +66,21 @@ class AuthService {
      */
     async logout() {
         try {
-            await api.post('/auth/logout');
+            await api.post(API_ENDPOINTS.AUTH.LOGOUT);
         } catch (err) {
             console.error('Logout error:', err);
         } finally {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            localStorage.removeItem('role');
+            localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+            localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+            localStorage.removeItem('role'); // Consider adding to constants if needed
         }
     }
 
     async fetchCurrentUser() {
         try {
-            const response = await api.get('/auth/me');
+            const response = await api.get(API_ENDPOINTS.AUTH.ME);
             const user = response.data.data.user;
-            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
             return user;
         } catch (err) {
             console.error('Error fetching current user:', err);
@@ -90,7 +92,7 @@ class AuthService {
      * Get current user from storage
      */
     getCurrentUser() {
-        const user = localStorage.getItem('user');
+        const user = localStorage.getItem(STORAGE_KEYS.USER_DATA);
         return user ? JSON.parse(user) : null;
     }
 
@@ -98,22 +100,22 @@ class AuthService {
      * Check if user is authenticated
      */
     isAuthenticated() {
-        return !!localStorage.getItem('token');
+        return !!localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
     }
 
     /**
      * Manually update the user in local storage
      */
     updateLocalStorageUser(user) {
-        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
     }
 
     /**
      * Helper to set session data
      */
     _setSession(token, user, role) {
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+        localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
         localStorage.setItem('role', role);
     }
 

@@ -1,18 +1,18 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import logo from '@assets/images/temporary_logo.png';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import authService from '@/services/authService';
 import { ROUTES } from '@/routes/routes';
-import { Search, FilePlus, ClipboardList, LogOut, User, FileText } from 'lucide-react';
+import { LogOut, User, Layout, Search, FileText, Database } from 'lucide-react';
 
 const JobseekerNavbar = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [user, setUser] = React.useState(authService.getCurrentUser());
 
     React.useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const userData = await authService.fetchCurrentUser(); // Need to implement this
+                const userData = await authService.fetchCurrentUser();
                 setUser(userData);
             } catch (err) {
                 console.error("Failed to fetch user data", err);
@@ -25,64 +25,95 @@ const JobseekerNavbar = () => {
         navigate(ROUTES.LOGOUT_CONFIRMATION);
     };
 
+    const isActive = (path) => {
+        if (path.includes('#')) {
+            return location.hash === path.split('#')[1] ? 'active' : '';
+        }
+        return location.pathname === path ? 'active' : '';
+    };
+
     const styles = {
         nav: {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            padding: '10px 40px',
-            backgroundColor: 'white',
-            borderBottom: '1px solid var(--border-subtle)',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+            padding: '12px 60px',
+            backgroundColor: 'var(--bg-glass)',
+            borderBottom: '1px solid var(--border-dashboard)',
             position: 'sticky',
             top: 0,
-            zIndex: 1000
+            zIndex: 1000,
+            backdropFilter: 'blur(20px) saturate(180%)',
+            boxShadow: 'var(--shadow-premium)',
+            transition: 'background-color 0.3s, border-color 0.3s'
         },
         logoContainer: {
             display: 'flex',
             alignItems: 'center',
-            gap: '12px'
+            gap: '14px'
         },
         brand: {
             fontWeight: '900',
-            color: 'var(--color-brand-primary)',
-            fontSize: '1.25rem',
-            letterSpacing: '-0.04em',
+            color: 'var(--text-main)',
+            fontSize: '0.9rem',
+            letterSpacing: '0.05em',
             textDecoration: 'none',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '12px',
+            textTransform: 'uppercase'
+        },
+        avatarBox: {
+            width: '32px',
+            height: '32px',
+            background: 'linear-gradient(135deg, #3E61FF 0%, #6366F1 100%)',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 8px 16px rgba(62, 97, 255, 0.2)',
+            border: '2px solid var(--bg-main)'
         },
         links: {
             display: 'flex',
             alignItems: 'center',
-            gap: '24px'
+            gap: '2px',
+            backgroundColor: 'var(--bg-dashboard)',
+            padding: '4px',
+            borderRadius: '12px',
+            border: '1px solid var(--border-dashboard)'
         },
         link: {
             textDecoration: 'none',
-            color: 'var(--text-main)',
-            fontWeight: '600',
-            fontSize: '0.9rem',
+            color: 'var(--text-muted)',
+            fontWeight: '700',
+            fontSize: '0.7rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            transition: 'all 0.2s',
-            padding: '8px 12px',
-            borderRadius: '8px'
+            gap: '8px'
         },
         logoutBtn: {
-            padding: '8px 16px',
-            backgroundColor: '#FFF5F5',
-            color: '#C53030',
-            border: '1px solid #FEB2B2',
-            borderRadius: '10px',
-            fontWeight: '600',
+            padding: '10px 20px',
+            backgroundColor: 'var(--text-main)',
+            color: 'var(--bg-main)',
+            border: 'none',
+            borderRadius: '8px',
+            fontWeight: '800',
             cursor: 'pointer',
-            fontSize: '0.9rem',
+            fontSize: '0.7rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.12em',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            transition: 'all 0.2s'
+            marginLeft: '24px',
+            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            boxShadow: '0 10px 20px rgba(15, 23, 42, 0.15)'
         }
     };
 
@@ -90,46 +121,58 @@ const JobseekerNavbar = () => {
         <nav style={styles.nav}>
             <div style={styles.logoContainer}>
                 <Link to={ROUTES.JOBSEEKER_DASHBOARD} style={styles.brand}>
-                    Welcome, {user?.first_name || 'Seeker'}
+                    <div style={styles.avatarBox}>
+                        <User size={16} color="white" strokeWidth={3} />
+                    </div>
+                    <span>Welcome, {user?.first_name || 'Seeker'}</span>
                 </Link>
             </div>
 
-            <div style={styles.links}>
-                <Link to={ROUTES.JOBSEEKER_DASHBOARD} style={styles.link} className="nav-item">
-                    <ClipboardList size={18} />
-                    Overview
-                </Link>
-                <Link to={`${ROUTES.JOBSEEKER_DASHBOARD}#find-jobs`} style={styles.link} className="nav-item">
-                    <Search size={18} />
-                    Find Jobs
-                </Link>
-                <Link to={ROUTES.CV_BUILDER} style={styles.link} className="nav-item">
-                    <FilePlus size={18} />
-                    Create CV
-                </Link>
-                <Link to={ROUTES.MY_CVS} style={styles.link} className="nav-item">
-                    <FileText size={18} />
-                    My CVs
-                </Link>
-                <Link to={ROUTES.JOBSEEKER_PROFILE} style={styles.link} className="nav-item">
-                    <User size={18} />
-                    My Profile
-                </Link>
-                <div style={{ width: '1px', height: '20px', backgroundColor: '#E2E8F0', margin: '0 8px' }}></div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={styles.links}>
+                    <Link to={ROUTES.JOBSEEKER_DASHBOARD} style={styles.link} className={`nav-item ${isActive(ROUTES.JOBSEEKER_DASHBOARD)}`}>
+                        <Layout size={14} /> Overview
+                    </Link>
+                    <Link to={ROUTES.JOBSEEKER_FIND_JOBS} style={styles.link} className={`nav-item ${isActive(ROUTES.JOBSEEKER_FIND_JOBS) ? 'active' : ''}`}>
+                        <Search size={14} /> Find Jobs
+                    </Link>
+                    <Link to={ROUTES.CV_BUILDER} style={styles.link} className={`nav-item ${isActive(ROUTES.CV_BUILDER)}`}>
+                        <FileText size={14} /> Build CV
+                    </Link>
+                    <Link to={ROUTES.MY_CVS} style={styles.link} className={`nav-item ${isActive(ROUTES.MY_CVS)}`}>
+                        <Database size={14} /> CV Storage
+                    </Link>
+                    <Link to={ROUTES.JOBSEEKER_PROFILE} style={styles.link} className={`nav-item ${isActive(ROUTES.JOBSEEKER_PROFILE)}`}>
+                        <User size={14} /> My Account
+                    </Link>
+                </div>
+
                 <button onClick={handleLogout} style={styles.logoutBtn} className="logout-btn">
-                    <LogOut size={18} />
-                    Logout
+                    <LogOut size={14} strokeWidth={3} />
+                    <span>Logout</span>
                 </button>
             </div>
 
             <style>{`
                 .nav-item:hover {
-                    background-color: #F3F6FF;
-                    color: var(--color-brand-primary) !important;
+                    color: var(--text-main) !important;
+                    background: var(--card-dashboard);
+                    box-shadow: var(--shadow-premium);
+                }
+                .nav-item.active {
+                    background: var(--card-dashboard) !important;
+                    color: #3E61FF !important;
+                    box-shadow: 0 4px 12px rgba(62, 97, 255, 0.08);
+                    border: 1px solid var(--border-dashboard);
                 }
                 .logout-btn:hover {
-                    background-color: #FEB2B2 !important;
-                    color: #9B2C2C !important;
+                    background-color: #3E61FF !important;
+                    color: white !important;
+                    transform: translateY(-1px);
+                    box-shadow: 0 15px 30px rgba(62, 97, 255, 0.25);
+                }
+                .logout-btn:active {
+                    transform: translateY(0);
                 }
             `}</style>
         </nav>

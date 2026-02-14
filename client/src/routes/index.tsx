@@ -14,14 +14,17 @@ import EmployerDashboard from '../pages/dashboard/EmployerDashboard';
 import CVBuilder from '../pages/cv-builder/CVBuilder';
 import MyProfile from '../pages/jobseeker/MyProfile';
 import MyCVs from '../pages/jobseeker/MyCVs';
+import FindJobs from '../pages/jobseeker/FindJobs';
 import EmployerLayout from '../components/layout/employer/EmployerLayout';
 import JobseekerLayout from '../components/layout/jobseeker/JobseekerLayout';
 import LogoutConfirmation from '../pages/auth/LogoutConfirmation';
+import ErrorPage from '../pages/error/ErrorPage';
 
 export const router = createBrowserRouter([
     {
         path: '/',
         element: <Layout />,
+        errorElement: <ErrorPage />,
         children: [
             {
                 index: true,
@@ -69,6 +72,7 @@ export const router = createBrowserRouter([
     {
         // Job Seeker specific routes
         element: <JobseekerLayout />,
+        errorElement: <ErrorPage />,
         children: [
             {
                 path: ROUTES.JOBSEEKER_DASHBOARD,
@@ -77,6 +81,10 @@ export const router = createBrowserRouter([
             {
                 path: ROUTES.CV_BUILDER,
                 element: <CVBuilder />,
+            },
+            {
+                path: ROUTES.JOBSEEKER_FIND_JOBS,
+                element: <FindJobs />,
             },
             {
                 path: ROUTES.MY_CVS,
@@ -96,6 +104,7 @@ export const router = createBrowserRouter([
     {
         // Employer specific routes
         element: <EmployerLayout />,
+        errorElement: <ErrorPage />,
         children: [
             {
                 path: ROUTES.EMPLOYER_DASHBOARD,
