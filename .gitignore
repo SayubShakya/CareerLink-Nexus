@@ -1,1 +1,9 @@
+# Agent configuration and transient data
 .agent/
+!.agent/workflows/
+!.agent/rules/
+!.agent/skills/
+!.agent/agents/
+!.agent/mcp_config.json
+!.agent/ARCHITECTURE.md
+node_modules
